@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BJT学習手帳</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#39C5BB">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BJT手帳">
+<style>
+  :root {
+    --bg: #0A0E16;
+    --bg-panel: #121826;
+    --bg-panel-2: #1B2333;
+    --teal: #39C5BB;
+    --teal-bright: #6BFFE8;
+    --teal-dim: rgba(57,197,187,0.14);
+    --teal-border: rgba(57,197,187,0.38);
+    --pink: #FF6FA5;
+    --pink-dim: rgba(255,111,165,0.14);
+    --pink-border: rgba(255,111,165,0.45);
+    --text: #EAF6F4;
+    --text-soft: #93A6B0;
+    --text-faint: #5C6B75;
+    --track: #1E2733;
+    --font-display: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: "SF Mono", "Roboto Mono", ui-monospace, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased; padding: 20px 16px 64px;
+    background-image: radial-gradient(circle at 15% 0%, rgba(57,197,187,0.08), transparent 45%), radial-gradient(circle at 85% 10%, rgba(255,111,165,0.05), transparent 40%);
+  }
+  .app { max-width: 620px; margin: 0 auto; }
+
+  .masthead { margin-bottom: 16px; border-bottom: 1px solid var(--teal-border); padding-bottom: 14px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.16em; color: var(--teal); font-weight: 700; text-transform: uppercase; }
+  .masthead h1 { font-size: 28px; margin: 4px 0 2px; letter-spacing: 0.02em; font-weight: 800; color: var(--text); text-shadow: 0 0 18px rgba(57,197,187,0.55), 0 0 2px rgba(107,255,232,0.6); }
+  .masthead .sub { margin: 0 0 10px; color: var(--text-soft); font-size: 13px; }
+  .eq-bars { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+  .eq-bars span { display: block; width: 3px; background: var(--teal); border-radius: 2px; box-shadow: 0 0 6px var(--teal); animation: eqPulse 1.1s ease-in-out infinite; }
+  .eq-bars span:nth-child(1){ height:40%; animation-delay: 0s; }
+  .eq-bars span:nth-child(2){ height:100%; animation-delay: .15s; }
+  .eq-bars span:nth-child(3){ height:60%; animation-delay: .3s; }
+  .eq-bars span:nth-child(4){ height:90%; animation-delay: .45s; }
+  .eq-bars span:nth-child(5){ height:50%; animation-delay: .6s; }
+  @keyframes eqPulse { 0%,100% { transform: scaleY(0.4); opacity: .6; } 50% { transform: scaleY(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .eq-bars span { animation: none; transform: scaleY(0.7); } }
+
+  .tabbar { display: flex; gap: 6px; margin-bottom: 18px; }
+  .tab-btn { flex: 1; padding: 10px 6px; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 700; border: 1.5px solid var(--teal-border); background: var(--bg-panel); color: var(--text-soft); border-radius: 3px; cursor: pointer; }
+  .tab-btn.active { background: var(--teal); color: #06171A; border-color: var(--teal); box-shadow: 0 0 16px rgba(57,197,187,0.55); }
+
+  .stampcard { background: var(--bg-panel); border: 1px solid var(--teal-border); border-radius: 8px; padding: 18px 18px 20px; margin-bottom: 18px; box-shadow: 0 0 24px rgba(57,197,187,0.06) inset; }
+  .streak-numbers { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .streak-block { display: flex; flex-direction: column; }
+  .streak-num { font-family: var(--font-mono); font-size: 40px; font-weight: 700; line-height: 1; color: var(--teal-bright); text-shadow: 0 0 16px rgba(107,255,232,0.6); }
+  .streak-num.muted { color: var(--text-soft); text-shadow: none; }
+  .streak-label { font-size: 11px; color: var(--text-faint); margin-top: 4px; letter-spacing: 0.02em; }
+  .streak-divider { width: 1px; height: 34px; background: var(--teal-border); }
+  .stamp-row { display: flex; justify-content: space-between; gap: 4px; margin-bottom: 16px; padding: 4px 0; overflow-x: auto; }
+  .stamp-day { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+  .stamp-dot { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--track); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--teal-bright); font-weight: 700; flex-shrink: 0; background: var(--bg); }
+  .stamp-dot.filled { border-color: var(--teal); background: var(--teal-dim); box-shadow: 0 0 10px rgba(57,197,187,0.65); }
+  .stamp-dot.today-ring { box-shadow: 0 0 0 2px var(--bg-panel), 0 0 0 3.5px var(--pink); }
+  .stamp-dot.filled.today-ring { box-shadow: 0 0 0 2px var(--bg-panel), 0 0 0 3.5px var(--pink), 0 0 10px rgba(57,197,187,0.65); }
+  .stamp-day-num { font-size: 9px; color: var(--text-faint); font-family: var(--font-mono); }
+  @keyframes stampPress { 0% { transform: scale(1.8) rotate(-18deg); opacity: 0; } 55% { transform: scale(0.88) rotate(-3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+  .just-stamped { animation: stampPress 420ms ease-out; }
+  .stamp-btn { width: 100%; padding: 12px; background: var(--teal); color: #06171A; border: none; border-radius: 4px; font-family: var(--font-display); font-size: 14px; font-weight: 800; letter-spacing: 0.02em; cursor: pointer; box-shadow: 0 0 18px rgba(57,197,187,0.4); }
+  .stamp-btn:active { opacity: 0.85; }
+  .stamp-btn.done { background: var(--bg); color: var(--teal-bright); border: 1.5px solid var(--teal); box-shadow: none; cursor: default; }
+
+  .progress-overview { margin-bottom: 16px; }
+  .progress-text { font-size: 13px; color: var(--text-soft); margin-bottom: 6px; font-family: var(--font-mono); }
+  .progress-text b { color: var(--teal-bright); font-size: 15px; }
+  .progress-bar-track { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-bright)); border-radius: 3px; transition: width 300ms ease; box-shadow: 0 0 8px rgba(57,197,187,0.6); }
+
+  .kanji-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); border: 1px solid var(--pink-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 22px; }
+  .kanji-summary-text { font-size: 13px; color: var(--text-soft); }
+  .kanji-summary-text b { color: var(--pink); font-family: var(--font-mono); font-size: 15px; }
+  .kanji-summary-btn { padding: 8px 14px; border-radius: 4px; border: 1.5px solid var(--pink); background: none; color: var(--pink); font-family: var(--font-display); font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; margin-left: 10px; }
+  .kanji-summary-btn:active { background: var(--pink-dim); }
+
+  .tier { margin-bottom: 16px; border: 1px solid var(--teal-border); border-radius: 8px; overflow: hidden; background: var(--bg-panel); }
+  .tier-head { background: var(--bg-panel-2); border-left: 3px solid var(--teal); color: var(--text); padding: 10px 14px; display: flex; justify-content: space-between; align-items: baseline; }
+  .tier-head .tier-title { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; color: var(--teal-bright); }
+  .tier-head .tier-sub { font-size: 10.5px; color: var(--text-faint); }
+  .tier-head .tier-count { font-family: var(--font-mono); font-size: 12px; color: var(--text-soft); flex-shrink: 0; margin-left: 8px; }
+  .item-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-top: 1px solid rgba(57,197,187,0.12); cursor: pointer; user-select: none; }
+  .item-row:first-of-type { border-top: none; }
+  .item-row:active { background: var(--bg-panel-2); }
+  .item-mark { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 1.5px solid var(--track); }
+  .item-mark.s0 { background: transparent; color: var(--text-faint); }
+  .item-mark.s1 { background: var(--bg); border-color: var(--teal); }
+  .item-mark.s1::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+  .item-mark.s2 { border-color: var(--teal); background: var(--teal-dim); color: var(--teal-bright); box-shadow: 0 0 8px rgba(57,197,187,0.55); }
+  .item-text { flex: 1; min-width: 0; }
+  .item-jp { font-size: 14px; font-weight: 600; color: var(--text); }
+  .item-row[data-status="0"] .item-jp { color: var(--text-soft); font-weight: 500; }
+  .item-vn { font-size: 11.5px; color: var(--text-faint); margin-top: 1px; }
+  .item-state-label { font-size: 11px; font-weight: 700; color: var(--text-faint); flex-shrink: 0; width: 16px; text-align: center; }
+  .item-row[data-status="2"] .item-state-label { color: var(--teal-bright); }
+  .item-row[data-status="1"] .item-state-label { color: var(--teal); }
+
+  .footer { text-align: center; margin-top: 28px; }
+  .reset-link { font-size: 11px; color: var(--text-faint); text-decoration: underline; cursor: pointer; background: none; border: none; font-family: var(--font-display); }
+  .loading { text-align: center; color: var(--text-soft); padding: 40px 0; font-size: 13px; }
+
+  .deck-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .deck-card { background: var(--bg-panel); border: 1.5px solid var(--teal-border); border-radius: 8px; padding: 16px 14px; cursor: pointer; text-align: left; }
+  .deck-card:active { background: var(--bg-panel-2); box-shadow: 0 0 14px rgba(57,197,187,0.3); }
+  .deck-card .deck-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; color: var(--text); }
+  .deck-card .deck-meta { font-size: 11px; color: var(--text-faint); font-family: var(--font-mono); }
+
+  .card-deckbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .deckbar-back { font-size: 12px; color: var(--text-soft); background: none; border: none; cursor: pointer; text-decoration: underline; font-family: var(--font-display); }
+  .card-progress { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+
+  .flip-scene { perspective: 1200px; margin-bottom: 18px; }
+  .flip-card { position: relative; width: 100%; min-height: 220px; transform-style: preserve-3d; transition: transform 420ms cubic-bezier(.4,.2,.2,1); cursor: pointer; }
+  .flip-card.flipped { transform: rotateY(180deg); }
+  .flip-face { position: absolute; inset: 0; backface-visibility: hidden; border: 1.5px solid var(--teal-border); border-radius: 10px; background: var(--bg-panel); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; box-shadow: 0 0 26px rgba(57,197,187,0.1); }
+  .flip-face.back { transform: rotateY(180deg); background: linear-gradient(160deg, var(--bg-panel-2), var(--bg-panel)); border-color: var(--pink-border); }
+  .flip-hint { position: absolute; top: 10px; right: 12px; font-size: 10px; color: var(--text-faint); letter-spacing: 0.08em; }
+  .flip-face.back .flip-hint { color: var(--pink); opacity: 0.7; }
+  .card-term { font-size: 26px; font-weight: 800; line-height: 1.3; color: var(--text); text-shadow: 0 0 14px rgba(57,197,187,0.35); }
+  .card-reading { font-size: 20px; font-weight: 700; color: var(--teal-bright); margin-top: 4px; }
+  .card-meaning { font-size: 17px; font-weight: 600; margin-top: 6px; color: var(--text); }
+  .card-explain { font-size: 13px; color: var(--text-soft); margin-top: 12px; line-height: 1.5; white-space: pre-line; }
+
+  .card-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .card-btn { padding: 12px; border-radius: 4px; font-family: var(--font-display); font-size: 13px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--teal-border); background: var(--bg-panel); color: var(--text); }
+  .card-btn.again { color: var(--text-soft); }
+  .card-btn.know { background: var(--teal-dim); border-color: var(--teal); color: var(--teal-bright); }
+  .card-nav { display: flex; justify-content: space-between; }
+  .nav-btn { padding: 10px 16px; border-radius: 4px; font-family: var(--font-display); font-size: 13px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--teal-border); background: none; color: var(--text-soft); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .quiz-prompt { font-size: 12px; color: var(--text-faint); margin-bottom: 6px; font-weight: 700; letter-spacing: 0.03em; }
+  .quiz-sentence { background: var(--bg-panel); border: 1.5px solid var(--teal-border); border-radius: 10px; padding: 20px 18px; font-size: 16px; line-height: 1.7; margin-bottom: 16px; font-weight: 600; color: var(--text); white-space: pre-line; }
+  .quiz-sentence .blank { display: inline-block; border-bottom: 2px solid var(--pink); min-width: 46px; color: var(--pink); }
+  .quiz-sentence.kanji-term { text-align: center; font-size: 30px; font-weight: 800; padding: 30px 18px; text-shadow: 0 0 16px rgba(57,197,187,0.4); }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .quiz-opt { padding: 13px 16px; border: 1.5px solid var(--teal-border); border-radius: 6px; background: var(--bg-panel); font-family: var(--font-display); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; color: var(--text); }
+  .quiz-opt:active { background: var(--bg-panel-2); }
+  .quiz-opt.correct { background: var(--teal-dim); border-color: var(--teal); color: var(--teal-bright); box-shadow: 0 0 12px rgba(57,197,187,0.4); }
+  .quiz-opt.wrong { background: var(--pink-dim); border-color: var(--pink); color: var(--pink); }
+  .quiz-opt.disabled { cursor: default; }
+  .quiz-opt.exam-selected { background: var(--teal-dim); border-color: var(--teal); color: var(--teal-bright); box-shadow: 0 0 12px rgba(57,197,187,0.4); }
+
+  .feedback-box { border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .feedback-box.ok { background: var(--teal-dim); border: 1.5px solid var(--teal); }
+  .feedback-box.bad { background: var(--pink-dim); border: 1.5px solid var(--pink); }
+  .feedback-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+  .feedback-box.ok .feedback-title { color: var(--teal-bright); }
+  .feedback-box.bad .feedback-title { color: var(--pink); }
+  .feedback-explain { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+
+  .quiz-score { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); margin-bottom: 12px; }
+  .quiz-next-btn { width: 100%; padding: 13px; background: var(--teal); color: #06171A; border: none; border-radius: 5px; font-family: var(--font-display); font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 0 16px rgba(57,197,187,0.4); }
+
+  .result-box { text-align: center; padding: 30px 16px; }
+  .result-score { font-family: var(--font-mono); font-size: 46px; font-weight: 800; color: var(--teal-bright); text-shadow: 0 0 20px rgba(107,255,232,0.6); }
+  .result-label { font-size: 13px; color: var(--text-faint); margin-top: 4px; margin-bottom: 24px; }
+  .result-actions { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ===== 模試 (mock exam) ===== */
+  .exam-intro { background: var(--bg-panel); border: 1.5px solid var(--teal-border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+  .exam-notice { font-size: 12.5px; color: var(--text-soft); line-height: 1.6; background: var(--bg); border: 1px solid var(--teal-border); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+  .exam-start-btn { width: 100%; padding: 14px; background: var(--pink); color: #2A0A16; border: none; border-radius: 5px; font-family: var(--font-display); font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 0 18px rgba(255,111,165,0.4); }
+  .exam-history { margin-top: 18px; }
+  .exam-history-title { font-size: 13px; font-weight: 700; color: var(--text-soft); margin-bottom: 8px; }
+  .exam-history-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid var(--teal-border); border-radius: 6px; margin-bottom: 6px; font-size: 12.5px; }
+  .exam-history-score { font-family: var(--font-mono); font-weight: 800; color: var(--teal-bright); }
+  .exam-history-meta { color: var(--text-faint); font-size: 11px; }
+  .exam-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; }
+  .exam-timer { font-family: var(--font-mono); font-size: 20px; font-weight: 800; padding: 6px 12px; border-radius: 6px; background: var(--bg-panel); border: 1.5px solid var(--teal-border); color: var(--teal-bright); }
+  .exam-timer.warn { color: var(--pink); border-color: var(--pink); animation: eqPulse 1s ease-in-out infinite; }
+  .exam-submit-btn { padding: 8px 14px; border-radius: 5px; border: 1.5px solid var(--pink); background: none; color: var(--pink); font-family: var(--font-display); font-size: 12px; font-weight: 700; cursor: pointer; }
+  .exam-section-label { font-size: 11px; font-weight: 700; color: var(--pink); letter-spacing: 0.05em; margin-bottom: 8px; }
+  .exam-passage { background: var(--bg); border: 1px solid var(--teal-border); border-radius: 8px; padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--text-soft); white-space: pre-line; margin-bottom: 14px; max-height: 260px; overflow-y: auto; }
+  .exam-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 14px 0; }
+  .exam-grid-btn { aspect-ratio: 1; border-radius: 4px; border: 1.5px solid var(--track); background: var(--bg-panel); color: var(--text-faint); font-family: var(--font-mono); font-size: 11px; cursor: pointer; }
+  .exam-grid-btn.current { border-color: var(--pink); box-shadow: 0 0 8px rgba(255,111,165,0.5); color: var(--pink); }
+  .exam-grid-btn.answered { border-color: var(--teal); color: var(--teal-bright); background: var(--teal-dim); }
+  .exam-nav { display: flex; gap: 10px; margin-top: 14px; }
+  .exam-nav button { flex: 1; padding: 12px; border-radius: 5px; font-family: var(--font-display); font-size: 13px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--teal-border); background: var(--bg-panel); color: var(--text); }
+  .exam-nav button:disabled { opacity: 0.3; }
+  .exam-result-section { margin-top: 22px; }
+  .exam-result-section h3 { font-size: 13px; color: var(--teal-bright); border-bottom: 1px solid var(--teal-border); padding-bottom: 6px; }
+  .exam-review-item { border: 1px solid var(--teal-border); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; font-size: 12.5px; }
+  .exam-review-item.wrong { border-color: var(--pink-border); }
+  .exam-review-q { color: var(--text-soft); margin-bottom: 6px; }
+  .exam-review-ans { font-weight: 700; }
+  .exam-review-ans.ok { color: var(--teal-bright); }
+  .exam-review-ans.bad { color: var(--pink); }
+
+  /* ===== 復習 (spaced repetition) ===== */
+  .review-hero { text-align: center; padding: 26px 16px; }
+  .review-due-num { font-family: var(--font-mono); font-size: 44px; font-weight: 800; color: var(--pink); text-shadow: 0 0 18px rgba(255,111,165,0.5); }
+  .review-empty { text-align: center; padding: 40px 16px; color: var(--text-soft); font-size: 13.5px; line-height: 1.7; }
+
+  /* ===== backup / export ===== */
+  .backup-row { display: flex; gap: 10px; margin-top: 10px; }
+  .backup-btn { flex: 1; padding: 10px; border-radius: 5px; border: 1.5px solid var(--teal-border); background: var(--bg-panel); color: var(--text-soft); font-family: var(--font-display); font-size: 12px; font-weight: 700; cursor: pointer; }
+</style>
+
+</head>
+<body>
+<div class="app" id="app"><div class="loading">読み込み中 — đang tải dữ liệu...</div></div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'bjt-tracker-data';
+  const HAS_CLAUDE_STORAGE = (typeof window.storage !== 'undefined' && window.storage !== null && typeof window.storage.get === 'function');
+
+  /* ===================== DASHBOARD TIERS (grammar / keigo / techniques) ===================== */
+  const TIERS = [
+    { id: '1a', title: '読解 セクション1 · 語彙・文法', sub: 'Ngữ pháp — Tier 1A', items: [
+      ['にとって', 'đối với (đánh giá theo góc nhìn)'],
+      ['にもかかわらず', 'mặc dù, dù vậy'],
+      ['一方だ', 'cứ...mãi không ngừng'],
+      ['にわたる', 'kéo dài suốt (thời gian/phạm vi)'],
+      ['っぱなし', 'để nguyên, bỏ mặc không xử lý'],
+      ['なくして', 'nếu không có...thì không thể có...'],
+      ['を限りに', 'kể từ (mốc kết thúc)'],
+      ['といっても', 'tuy nói là...nhưng thực ra...'],
+      ['かねる／かねない', 'khó mà làm được / có thể xảy ra điều xấu'],
+      ['とあれば', 'nếu là vì...thì sẵn sàng...'],
+    ]},
+    { id: '1b', title: '読解 セクション2 · 表現読解', sub: 'Kính ngữ & cách diễn đạt — Tier 1B', items: [
+      ['お乗りします', 'mời ai đó lên xe mình (謙譲語)'],
+      ['外出しております', 'báo cáo đang ra ngoài (謙譲語)'],
+      ['ご説明', 'giải thích — không nhầm với ご解説/ご釈明'],
+      ['お届けいたします', 'cam kết giao hàng (謙譲語)'],
+      ['避けられないよ', 'không thể tránh khỏi'],
+      ['お伺いいたします', 'hỏi thông tin (謙譲語 kép, lịch sự nhất)'],
+      ['耳が痛い', '"chối tai" (thành ngữ)'],
+      ['どの部署の鈴木でしょうか', 'cách hỏi lịch sự khi cần làm rõ'],
+      ['拝見', 'xem tài liệu người khác gửi (謙譲語)'],
+      ['見当がつかない', 'không đoán được / không hình dung được'],
+    ]},
+    { id: 'kg', title: '敬語 · 尊敬語 / 謙譲語', sub: 'Hệ thống động từ kính ngữ — Tier 1C', items: [
+      ['おっしゃる', '尊敬語 của 言う — cho hành động người khác'],
+      ['参る', '謙譲語 của 行く／来る — cho hành động bản thân'],
+      ['いらっしゃる', '尊敬語 của 行く／来る／いる'],
+      ['おる', '謙譲語 của いる'],
+      ['なさる', '尊敬語 của する'],
+      ['いたす', '謙譲語 của する'],
+      ['ご覧になる', '尊敬語 của 見る'],
+      ['拝見する', '謙譲語 của 見る'],
+      ['召し上がる', '尊敬語 của 食べる／飲む'],
+      ['いただく', '謙譲語 của もらう／食べる／飲む'],
+      ['伺う', '謙譲語 của 聞く／訪ねる'],
+      ['差し上げる', '謙譲語 của あげる'],
+      ['お目にかかる', '謙譲語 của 会う'],
+      ['存じ上げる', '謙譲語 của 知っている'],
+      ['ご存知だ', '尊敬語 của 知っている'],
+    ]},
+    { id: 't2', title: '読解 セクション3 · 総合読解', sub: 'Kỹ thuật đọc nhanh — Tier 2', items: [
+      ['文書構造', '前文は流し読み → 主文は「さて」「つきましては」の後'],
+      ['グラフ併用問題', 'タイトル確認 → 内容把握 → 本文照合の順'],
+      ['質問を先に読む', 'đọc câu hỏi trước khi đọc bài để biết cần tìm gì'],
+    ]},
+    { id: 't4', title: 'ビジネスコラム', sub: 'Từ vựng bổ trợ — Tier 4', items: [
+      ['慣用表現 32語', '赤が出る、足がかり、頭打ち、糸口...'],
+      ['カタカナ語 105語', 'アウトソーシング、クライアント、プレゼン...'],
+      ['ビジネス基本単語 139語', 'xem tab 漢字語彙 riêng bên dưới'],
+    ]},
+  ];
+  /* Lưu ý: app tập trung 100% vào 読解 (phần duy nhất luyện được không cần audio).
+     聴解・聴読解 đã được loại bỏ khỏi app — sách gốc có kèm CD nhưng không có trong project này,
+     luyện tips suông không audio thật dễ gây ảo tưởng đã chuẩn bị cho 2/3 thời lượng đề thi. */
+  const DEFAULT_STATUS = { '1a-0':2,'1a-1':2,'1a-2':1,'1a-3':2,'1a-4':1,'1a-5':2,'1a-6':2,'1a-7':2,'1a-8':1,'1a-9':1 };
+
+  /* ===================== FLASHCARD / QUIZ: grammar + keigo (35 items, real sentences) ===================== */
+  const STUDY_ITEMS = [
+    { id:'1a-0', term:'にとって', meaning:'đối với (đánh giá theo góc nhìn)', explain:'Dùng khi đánh giá sự việc theo góc nhìn của ai đó, đi với tính từ đánh giá (重要だ、大切だ). Khác に対して — chỉ đối tượng của một hành động cụ thể.',
+      quiz:{ sentence:'今のわが社に＿＿＿一番重要なことは、優秀な人材の採用だ。', options:['つれて','とって','対して','限って'], correct:1 } },
+    { id:'1a-1', term:'にもかかわらず', meaning:'mặc dù, dù vậy', explain:'Nghịch đảo logic, mang sắc thái bất ngờ/bất mãn — dùng khi kết quả trái với điều mong đợi.',
+      quiz:{ sentence:'彼は約束の時間に遅れた＿＿＿、一言も謝らなかった。', options:['に加えて','に反して','にともなって','にもかかわらず'], correct:3 } },
+    { id:'1a-2', term:'一方だ', meaning:'cứ...mãi không ngừng', explain:'Diễn tả xu hướng thay đổi liên tục theo 1 chiều (chỉ tăng hoặc chỉ giảm), luôn đi sau động từ.',
+      quiz:{ sentence:'A社との技術提携以後、B社の株価は上がる＿＿＿だ。', options:['一方','一気','一目','一因'], correct:0 } },
+    { id:'1a-3', term:'にわたる', meaning:'kéo dài suốt (thời gian/phạm vi)', explain:'Mẫu cố định bổ nghĩa danh từ, diễn tả phạm vi hoặc thời gian trải dài.',
+      quiz:{ sentence:'3年に＿＿＿長期プロジェクトがやっと終了した。', options:['かかる','通じる','広がる','わたる'], correct:3 } },
+    { id:'1a-4', term:'っぱなし', meaning:'để nguyên, bỏ mặc không xử lý', explain:'Mang sắc thái tiêu cực — bỏ mặc một trạng thái không xử lý tiếp.',
+      quiz:{ sentence:'誰だ、こんな所に大事な書類を＿＿＿にしているのは。', options:['置きながら','置きっぱなし','置いたなり','置き去り'], correct:1 } },
+    { id:'1a-5', term:'なくして', meaning:'nếu không có...thì không thể có...', explain:'Mẫu trang trọng: [danh từ]＋なくして(は)＋[vế phủ định].',
+      quiz:{ sentence:'社員の意欲＿＿＿会社の繁栄はありえない。', options:['なくして','のみならず','あってこそ','ならでは'], correct:0 } },
+    { id:'1a-6', term:'をもって', meaning:'kể từ, tại (mốc thời gian, trang trọng)', explain:'[SỬA LỖI 12/08] Đáp án chính thức của sách (p.45, câu 7) là をもって (đáp án 1), không phải を限りに. をもって đánh dấu mốc trang trọng cho một SỰ KIỆN MỚI bắt đầu (ở đây là chuyển việc); còn を限りに mang nghĩa "chấm dứt, không còn nữa" nên hợp với ngữ cảnh kết thúc một trạng thái hơn là bắt đầu việc mới.',
+      quiz:{ sentence:'長い間お世話になりましたが、今月末＿＿＿アメリカへ転勤することになりました。', options:['をもって','になるやいなや','に至って','を限りに'], correct:0 } },
+    { id:'1a-7', term:'といっても', meaning:'tuy nói là...nhưng thực ra...', explain:'Làm giảm nhẹ/điều chỉnh lại ấn tượng ban đầu vừa nêu ra.',
+      quiz:{ sentence:'東京勤務が長い＿＿＿、それほど東京に詳しいわけではありません。', options:['とともに','といっても','となると','といえば'], correct:1 } },
+    { id:'1a-8', term:'かねる／かねない', meaning:'khó mà làm được / có thể xảy ra điều xấu', explain:'かねる: chủ ngữ là NGƯỜI, không thể làm gì đó. かねない: chủ ngữ là SỰ VIỆC, có nguy cơ gây hậu quả xấu.',
+      quiz:{ sentence:'大変申し訳ありませんが、担当者がただいま外出しておりまして、詳細については分かり＿＿＿。', options:['えます','えません','かねます','かねません'], correct:2 } },
+    { id:'1a-9', term:'とあれば', meaning:'nếu là vì...thì sẵn sàng...', explain:'Diễn tả điều kiện đặc biệt khiến người ta quyết tâm/sẵn lòng làm gì đó.',
+      quiz:{ sentence:'業績向上のため＿＿＿、残業もいとわない。', options:['といいつつ','とばかりに','としても','とあれば'], correct:3 } },
+    { id:'1b-0', term:'お乗りください', meaning:'mời cấp trên lên xe (尊敬語)', explain:'[SỬA LỖI 12/08] Đáp án chính thức của sách (p.46, câu 1) là お乗りください (đáp án 1), không phải お乗りします. Hành động "lên xe" ở đây do 部長 (cấp trên) thực hiện, nên phải dùng 尊敬語 để nâng hành động của HỌ (お乗りください), không thể dùng 謙譲語 (お乗りします) vốn chỉ hạ thấp hành động của CHÍNH MÌNH.',
+      quiz:{ sentence:'A：ちょっと急いでるんだ。だれか駅まで車に乗せてくれないかなあ。\nB：部長、わたしの車に＿＿＿。', options:['お乗りください','お乗りします','お乗せしてあげます','お乗せいただきます'], correct:0 } },
+    { id:'1b-1', term:'外出しております', meaning:'báo cáo đang ra ngoài (謙譲語)', explain:'謙譲語 khiêm tốn khi báo cáo với khách rằng người trong công ty mình đang ra ngoài.',
+      quiz:{ sentence:'A：JL物産の鈴木ですが、田中部長お願いします。\nB：申し訳ありません。田中は、ただいま＿＿＿。', options:['いらっしゃいません','お出掛けしております','お留守でございます','外出しております'], correct:3 } },
+    { id:'1b-2', term:'ご説明', meaning:'giải thích — không nhầm với ご解説/ご釈明', explain:'ご解説 (giải thích học thuật), ご釈明 (biện minh), ご説得 (thuyết phục) đều không hợp ngữ cảnh trình bày phương châm kinh doanh.',
+      quiz:{ sentence:'では、部長の森田から来期の経営方針について＿＿＿申し上げます。', options:['ご解説','ご説明','ご釈明','ご説得'], correct:1 } },
+    { id:'1b-3', term:'お届けいたします', meaning:'cam kết giao hàng (謙譲語)', explain:'謙譲語 — cam kết chắc chắn sẽ tự tay giao hàng đúng hẹn.',
+      quiz:{ sentence:'A：鈴木君、帰りにJL商会に寄って、この書類を届けてくれないか。急ぎの書類なんだ。\nB：はい、分かりました。間違いなく＿＿＿。', options:['届けさせます','届けていただきます','お届けくださいます','お届けいたします'], correct:3 } },
+    { id:'1b-4', term:'避けられないよ', meaning:'không thể tránh khỏi', explain:'Cách nói tự nhiên khi khẳng định điều gì chắc chắn xảy ra, khác sắc thái với ~ざるを得ない.',
+      quiz:{ sentence:'こんなに大幅かつ急激な円高になったら、いくら企業努力をしても減収減益は＿＿＿。', options:['避けないはずはないよ','避けられないよ','避けられないことはないよ','避けざるを得ないよ'], correct:1 } },
+    { id:'1b-5', term:'お伺いいたします', meaning:'hỏi thông tin (謙譲語 kép, lịch sự nhất)', explain:'謙譲語 kép — mức lịch sự cao nhất khi chủ động hỏi thông tin thay cho người vắng mặt.',
+      quiz:{ sentence:'A：上田部長さまはいらっしゃいますか。\nB：上田は今、出掛けております。私でよろしければ、ご用件を＿＿＿。', options:['聞きましょうか','伺いましょうか','お伺いいたします','聞いてあげます'], correct:2 } },
+    { id:'1b-6', term:'耳が痛い', meaning:'"chối tai" (thành ngữ)', explain:'Thành ngữ — cảm giác "chối tai" khi bị người khác nhắc đúng điểm yếu của mình.',
+      quiz:{ sentence:'A：山本さんの机の上はいつも書類の山ですね。だから書類探しに時間がかかるんですね。\nB：いやあ、＿＿＿が痛いなあ。すぐ片付けます。', options:['頭','耳','目','口'], correct:1 } },
+    { id:'1b-7', term:'どの部署の鈴木でしょうか', meaning:'cách hỏi lịch sự khi cần làm rõ', explain:'Cách hỏi lịch sự để làm rõ khi có nhiều người trùng tên.',
+      quiz:{ sentence:'A：4時に鈴木様にお会いすることになっているんですが……。\nB：私どもには鈴木が4人おりますが、＿＿＿。', options:['鈴木さんの部署がお分かりですか','何課の鈴木さんでしょうか','どの部署の鈴木でしょうか','鈴木の部署を知っていますか'], correct:2 } },
+    { id:'1b-8', term:'拝見', meaning:'xem tài liệu người khác gửi (謙譲語)', explain:'謙譲語 — cách khiêm tốn nói "đã xem" tài liệu/vật phẩm người khác gửi cho mình.',
+      quiz:{ sentence:'このたびは貴重な資料をお貸しいただき、ありがとうございました。さっそく＿＿＿させていただきました。', options:['拝受','拝見','拝礼','拝察'], correct:1 } },
+    { id:'1b-9', term:'見当がつかない', meaning:'không đoán được / không hình dung được', explain:'Thành ngữ cố định — "không hình dung/ước lượng được" điều gì đó.',
+      quiz:{ sentence:'A：今度のプロジェクト、予算はどれくらいになるのかな。\nB：うーん、大きいプロジェクトだから、ちょっと＿＿＿がつかないな。', options:['見当','見込み','目当て','目算'], correct:0 } },
+    { id:'kg-0', term:'おっしゃる', meaning:'尊敬語 của 言う (nói) — dùng cho hành động người khác', explain:'尊敬語 nâng cao hành động của người khác (cấp trên, khách), không dùng cho hành động của bản thân.',
+      quiz:{ sentence:'部長が会議で＿＿＿とおり、来月から新しい制度が始まります。', options:['申した','おっしゃった','申し上げた','言わせた'], correct:1 } },
+    { id:'kg-1', term:'参る', meaning:'謙譲語 của 行く／来る (đi/đến) — dùng cho bản thân', explain:'謙譲語 hạ thấp hành động của bản thân để thể hiện sự tôn trọng đối phương.',
+      quiz:{ sentence:'明日、そちらへ10時に＿＿＿。', options:['いらっしゃいます','おいでになります','参ります','お越しになります'], correct:2 } },
+    { id:'kg-2', term:'いらっしゃる', meaning:'尊敬語 của 行く／来る／いる — dùng cho người khác', explain:'Một trong những 尊敬語 phổ biến nhất, dùng cho cả 3 nghĩa đi/đến/ở.',
+      quiz:{ sentence:'社長は明日の会議に＿＿＿予定です。', options:['参る','おる','いらっしゃる','伺う'], correct:2 } },
+    { id:'kg-3', term:'おる', meaning:'謙譲語 của いる (ở, có mặt) — dùng cho bản thân/công ty mình', explain:'Dùng để khiêm tốn khi nói mình đang ở đâu, thường thấy trong 外出しております.',
+      quiz:{ sentence:'あいにく、田中はただいま外出して＿＿＿。', options:['いらっしゃいます','います','おります','なさいます'], correct:2 } },
+    { id:'kg-4', term:'なさる', meaning:'尊敬語 của する (làm) — dùng cho người khác', explain:'尊敬語 của する, hay dùng khi hỏi khách/cấp trên đã làm gì.',
+      quiz:{ sentence:'部長はもうサインを＿＿＿か。', options:['いたしました','なさいました','させました','されられました'], correct:1 } },
+    { id:'kg-5', term:'いたす', meaning:'謙譲語 của する (làm) — dùng cho bản thân', explain:'謙譲語 của する, rất hay gặp trong văn bản business (お願いいたします、ご案内いたします...).',
+      quiz:{ sentence:'資料の準備は私が＿＿＿。', options:['なさいます','される','いたします','していただきます'], correct:2 } },
+    { id:'kg-6', term:'ご覧になる', meaning:'尊敬語 của 見る (xem) — dùng cho người khác', explain:'尊敬語 của 見る, dùng khi mời/hỏi khách xem cái gì.',
+      quiz:{ sentence:'こちらの資料を＿＿＿ください。', options:['拝見して','ご覧になって','お目にかけて','見せられて'], correct:1 } },
+    { id:'kg-7', term:'拝見する', meaning:'謙譲語 của 見る (xem) — dùng cho bản thân', explain:'謙譲語 của 見る, dùng khi khiêm tốn nói mình đã xem tài liệu của người khác.',
+      quiz:{ sentence:'お送りいただいた資料を＿＿＿しました。', options:['ご覧に','拝見','お目に','拝読'], correct:1 } },
+    { id:'kg-8', term:'召し上がる', meaning:'尊敬語 của 食べる／飲む (ăn/uống) — dùng cho người khác', explain:'尊敬語 của 食べる・飲む, thường dùng trong tiếp đãi khách.',
+      quiz:{ sentence:'どうぞ、こちらのお茶を＿＿＿ください。', options:['いただいて','召し上がって','頂戴して','いたして'], correct:1 } },
+    { id:'kg-9', term:'いただく', meaning:'謙譲語 của もらう／食べる／飲む — dùng cho bản thân', explain:'謙譲語 đa năng: nhận (もらう), ăn/uống, và trong mẫu ～ていただく (nhờ ai làm gì cho mình).',
+      quiz:{ sentence:'貴重なご意見を＿＿＿、ありがとうございます。', options:['さしあげ','くださり','いただき','あげ'], correct:2 } },
+    { id:'kg-10', term:'伺う', meaning:'謙譲語 của 聞く／訪ねる — dùng cho bản thân', explain:'謙譲語 dùng cho cả nghĩa "hỏi" và "thăm/đến" — tùy ngữ cảnh.',
+      quiz:{ sentence:'先ほどのお話について、一つ＿＿＿たいことがございます。', options:['申し上げ','伺い','おっしゃり','なさり'], correct:1 } },
+    { id:'kg-11', term:'差し上げる', meaning:'謙譲語 của あげる (cho, tặng) — dùng khi bản thân cho người khác', explain:'謙譲語 dùng khi khiêm tốn nói về việc mình tặng/cho người có địa vị cao hơn.',
+      quiz:{ sentence:'資料を郵送で＿＿＿ますので、ご確認ください。', options:['いただき','くださり','差し上げ','さしあげられ'], correct:2 } },
+    { id:'kg-12', term:'お目にかかる', meaning:'謙譲語 của 会う (gặp) — dùng cho bản thân', explain:'謙譲語 lịch sự cao, dùng khi khiêm tốn nói về việc mình sẽ/đã gặp người có địa vị cao hơn.',
+      quiz:{ sentence:'来週、貴社にて＿＿＿ことを楽しみにしております。', options:['お会いになる','お目にかかる','お会いさせる','お目にする'], correct:1 } },
+    { id:'kg-13', term:'存じ上げる', meaning:'謙譲語 của 知っている (biết) — dùng cho bản thân, khi biết về một người', explain:'存じ上げる dùng khi biết về một người cụ thể có địa vị cao hơn.',
+      quiz:{ sentence:'そのお名前は以前から＿＿＿おります。', options:['ご存知して','存じ上げて','おっしゃって','伺って'], correct:1 } },
+    { id:'kg-14', term:'ご存知だ', meaning:'尊敬語 của 知っている (biết) — dùng cho người khác', explain:'尊敬語, hỏi/nói về việc người khác biết điều gì.',
+      quiz:{ sentence:'部長は、その件について＿＿＿でしょうか。', options:['存じ上げて','ご存知','拝見して','伺って'], correct:1 } },
+  ];
+
+  /* ===================== KANJI VOCAB: 140 từ ビジネス基本単語 (phụ lục sách) ===================== */
+  const KANJI_RAW = [
+    ['相見積り','あいみつもり','so sánh báo giá nhiều nơi'],['赤字','あかじ','thâm hụt, lỗ'],['異動','いどう','điều chuyển nhân sự'],
+    ['打ち合わせ','うちあわせ','họp bàn, trao đổi'],['売上','うりあげ','doanh số'],['売上高','うりあげだか','tổng doanh số'],
+    ['営業','えいぎょう','kinh doanh, bán hàng'],['円高','えんだか','đồng yên tăng giá'],['円安','えんやす','đồng yên giảm giá'],
+    ['親会社','おやがいしゃ','công ty mẹ'],['卸(売り)','おろし(うり)','bán buôn'],['御社','おんしゃ','quý công ty (nói với khách)'],
+    ['開発','かいはつ','phát triển'],['価格','かかく','giá cả'],['型番','かたばん','mã model'],
+    ['合併','がっぺい','sáp nhập'],['稼働','かどう','vận hành, hoạt động'],['株価','かぶか','giá cổ phiếu'],
+    ['株式会社','かぶしきがいしゃ','công ty cổ phần'],['株主','かぶぬし','cổ đông'],['為替相場','かわせそうば','tỷ giá hối đoái'],
+    ['管理職','かんりしょく','vị trí quản lý'],['企画書','きかくしょ','bản kế hoạch'],['企業','きぎょう','doanh nghiệp'],
+    ['貴社','きしゃ','quý công ty (viết)'],['業界','ぎょうかい','ngành'],['供給','きょうきゅう','cung cấp'],
+    ['競合他社','きょうごうたしゃ','công ty đối thủ'],['業者','ぎょうしゃ','nhà cung cấp, đơn vị kinh doanh'],['業種','ぎょうしゅ','loại hình kinh doanh'],
+    ['業績','ぎょうせき','thành tích kinh doanh'],['業務','ぎょうむ','nghiệp vụ'],['拠点','きょてん','cứ điểm, chi nhánh'],
+    ['金利','きんり','lãi suất'],['黒字','くろじ','có lãi'],['経営','けいえい','quản lý điều hành'],
+    ['景気','けいき','tình hình kinh tế'],['経費','けいひ','chi phí'],['契約','けいやく','hợp đồng'],
+    ['決済','けっさい','thanh toán, quyết toán'],['決裁','けっさい','phê duyệt'],['決算','けっさん','quyết toán tài chính'],
+    ['原油','げんゆ','dầu thô'],['広告','こうこく','quảng cáo'],['交渉','こうしょう','đàm phán'],
+    ['購入','こうにゅう','mua vào'],['小売り','こうり','bán lẻ'],['子会社','こがいしゃ','công ty con'],
+    ['小切手','こぎって','séc'],['顧客','こきゃく','khách hàng'],['在庫','ざいこ','tồn kho'],
+    ['産業','さんぎょう','ngành công nghiệp'],['残業','ざんぎょう','làm thêm giờ'],['仕入れ','しいれ','nhập hàng'],
+    ['事業','じぎょう','sự nghiệp kinh doanh'],['支社','ししゃ','chi nhánh'],['市場','しじょう','thị trường'],
+    ['実績','じっせき','thành tích thực tế'],['支払い','しはらい','thanh toán, chi trả'],['資本','しほん','vốn'],
+    ['従業員','じゅうぎょういん','nhân viên'],['収支','しゅうし','thu chi'],['受注','じゅちゅう','nhận đơn hàng'],
+    ['出荷','しゅっか','xuất kho'],['需要','じゅよう','nhu cầu'],['照会','しょうかい','tra cứu, hỏi'],
+    ['消費者','しょうひしゃ','người tiêu dùng'],['商品','しょうひん','hàng hóa'],['人件費','じんけんひ','chi phí nhân sự'],
+    ['人材','じんざい','nhân tài'],['人事','じんじ','nhân sự'],['新入社員','しんにゅうしゃいん','nhân viên mới'],
+    ['信用状','しんようじょう','thư tín dụng'],['請求書','せいきゅうしょ','hóa đơn yêu cầu thanh toán'],['生産','せいさん','sản xuất'],
+    ['製造業','せいぞうぎょう','ngành sản xuất chế tạo'],['製品','せいひん','sản phẩm'],['接待','せったい','tiếp đãi khách'],
+    ['設備投資','せつびとうし','đầu tư trang thiết bị'],['外回り','そとまわり','đi công tác bên ngoài'],['損失','そんしつ','tổn thất'],
+    ['大企業','だいきぎょう','doanh nghiệp lớn'],['退職','たいしょく','nghỉ việc, về hưu'],['代表取締役','だいひょうとりしまりやく','giám đốc đại diện'],
+    ['他社','たしゃ','công ty khác'],['棚卸し','たなおろし','kiểm kê hàng tồn kho'],['単価','たんか','đơn giá'],
+    ['短期','たんき','ngắn hạn'],['担当部署','たんとうぶしょ','bộ phận phụ trách'],['中小企業','ちゅうしょうきぎょう','doanh nghiệp vừa và nhỏ'],
+    ['注文','ちゅうもん','đặt hàng'],['長期','ちょうき','dài hạn'],['提携','ていけい','liên kết hợp tác'],
+    ['手形','てがた','hối phiếu'],['転勤','てんきん','chuyển công tác'],['転職','てんしょく','chuyển việc'],
+    ['伝票','でんぴょう','phiếu ghi'],['倒産','とうさん','phá sản'],['得意先','とくいさき','khách hàng quen'],
+    ['取締役','とりしまりやく','giám đốc điều hành, thành viên HĐQT'],['取引','とりひき','giao dịch'],['取引先','とりひきさき','đối tác giao dịch'],
+    ['入荷','にゅうか','nhập hàng về'],['入金','にゅうきん','nhận tiền, nộp tiền'],['値上げ','ねあげ','tăng giá'],
+    ['値下げ','ねさげ','giảm giá'],['納期','のうき','thời hạn giao hàng'],['納入','のうにゅう','giao nộp'],
+    ['納品','のうひん','giao hàng'],['伸び率','のびりつ','tỷ lệ tăng trưởng'],['売却','ばいきゃく','bán đi, thanh lý'],
+    ['配属','はいぞく','phân công, bố trí'],['配当','はいとう','cổ tức'],['派遣社員','はけんしゃいん','nhân viên phái cử'],
+    ['発送','はっそう','gửi đi'],['発注','はっちゅう','đặt hàng (từ phía mua)'],['販売','はんばい','bán hàng'],
+    ['販売価格','はんばいかかく','giá bán'],['引き継ぎ','ひきつぎ','bàn giao'],['不況','ふきょう','suy thoái kinh tế'],
+    ['部署','ぶしょ','bộ phận'],['赴任','ふにん','đi nhậm chức'],['不良品','ふりょうひん','hàng lỗi'],
+    ['不渡り','ふわたり','séc/hối phiếu không thanh toán được'],['弊社','へいしゃ','công ty chúng tôi (khiêm nhường)'],['返品','へんぴん','trả hàng'],
+    ['報告書','ほうこくしょ','báo cáo'],['本社','ほんしゃ','trụ sở chính'],['見積り','みつもり','báo giá'],
+    ['見積書','みつもりしょ','bản báo giá'],['明細書','めいさいしょ','bảng kê chi tiết'],['役員','やくいん','thành viên ban lãnh đạo'],
+    ['融資','ゆうし','cấp vốn vay'],['輸出','ゆしゅつ','xuất khẩu'],['輸入','ゆにゅう','nhập khẩu'],
+    ['予算','よさん','ngân sách'],['利益','りえき','lợi nhuận'],['領収書','りょうしゅうしょ','biên lai, hóa đơn'],
+    ['稟議書','りんぎしょ','văn bản xin phê duyệt tuần tự'],
+  ];
+  const KANJI_VOCAB = KANJI_RAW.map((r,idx)=>({ id:'kv-'+idx, term:r[0], reading:r[1], meaning:r[2] }));
+  const KANJI_QUIZ_BATCH = 15;
+
+  /* ===================== NỘI DUNG MỞ RỘNG — nguồn xác thực từ 敬語の指針 + 模試と対策 (ビジネスコラム p.158-171) ===================== */
+  const IDIOM_ITEMS = [
+    { id:"id-1", term:"赤が出る", meaning:"bị lỗ, thâm hụt (xuất hiện số âm)", explain:"Nghĩa: bị lỗ, thâm hụt (xuất hiện số âm). Ví dụ khác trong sách: 「そこまで値引きをしたら、私どもに＿＿＿しまいます。これ以上値下げられません。」（đáp án: 赤が出る）", quiz:{ sentence:"原料コストが急速に上がっているので、今期決算は＿＿＿のを覚悟しなければならない。", options:["先手を打つ","兆し","赤が出る","試金石"], correct:2 } },
+    { id:"id-2", term:"足がかり", meaning:"bàn đạp, điểm tựa ban đầu", explain:"Nghĩa: bàn đạp, điểm tựa ban đầu. Ví dụ khác trong sách: 「将来の確固たる＿＿＿をつかむには、どうしてもT社との提携交渉を成功させなければならない。」（đáp án: 足がかり）", quiz:{ sentence:"パリに1号店を開設することは、ヨーロッパ市場への＿＿＿を築くために先ず必要なことである。", options:["活路","赤が出る","先手を打つ","足がかり"], correct:3 } },
+    { id:"id-3", term:"頭打ち", meaning:"chững lại, chạm trần (không tăng nữa)", explain:"Nghĩa: chững lại, chạm trần (không tăng nữa). Ví dụ khác trong sách: 「新型機種が出たら、半年で現行機種の販売台数は＿＿＿になるだろう。」（đáp án: 頭打ち）", quiz:{ sentence:"独創的な経営で売上を伸ばしてきたA社だが、社長交代後はヒット商品もなく業績が＿＿＿の状態である。", options:["しわ寄せ","糸口","頭打ち","赤が出る"], correct:2 } },
+    { id:"id-4", term:"後押し", meaning:"hậu thuẫn, hỗ trợ phía sau", explain:"Nghĩa: hậu thuẫn, hỗ trợ phía sau. Ví dụ khác trong sách: 「当社の事業縮小が、N社の市場独占を＿＿＿する結果になってしまった。」（đáp án: 後押し）", quiz:{ sentence:"「弊社はまだまだこれからでございます。御社からの＿＿＿を是非お願いいたします。」", options:["活路","大台","赤が出る","後押し"], correct:3 } },
+    { id:"id-5", term:"暗礁に乗り上げる", meaning:"mắc cạn, bế tắc bất ngờ", explain:"Nghĩa: mắc cạn, bế tắc bất ngờ. Ví dụ khác trong sách: 「新規プロジェクトは、メンバーの病気や事故などが重なり＿＿＿。」（đáp án: 暗礁に乗り上げる）", quiz:{ sentence:"2国間の貿易交渉は、双方の利害がかみ合わず＿＿＿しまった。", options:["うなぎ登り","暗礁に乗り上げる","引き金","引けを取る"], correct:1 } },
+    { id:"id-6", term:"糸口", meaning:"đầu mối, manh mối giải quyết", explain:"Nghĩa: đầu mối, manh mối giải quyết. Ví dụ khác trong sách: 「銀行からの融資が決まり、事業資金問題は、ようやく解決の＿＿＿が見えてきた。」（đáp án: 糸口）", quiz:{ sentence:"二国間の共同油田開発の交渉は難航し、合意の＿＿＿が見えそうにもない。", options:["糸口","巻き返し","本腰","うなぎ登り"], correct:0 } },
+    { id:"id-7", term:"うなぎ登り", meaning:"tăng vọt, tăng thẳng đứng", explain:"Nghĩa: tăng vọt, tăng thẳng đứng. Ví dụ khác trong sách: 「人気の新商品XYZは、若者のみならず中高年の心も捕らえて、＿＿＿の売れ行きである。」（đáp án: うなぎ登り）", quiz:{ sentence:"S社の株価は一時＿＿＿の勢いであったが、経理の粉飾が明らかになって急落した。", options:["正念場","脚光を浴びる","うなぎ登り","公算"], correct:2 } },
+    { id:"id-8", term:"追い風", meaning:"gió thuận, thời cơ thuận lợi", explain:"Nghĩa: gió thuận, thời cơ thuận lợi. Ví dụ khác trong sách: 「エネルギー価格の上昇を＿＿＿に、大手商社の業績が拡大している。」（đáp án: 追い風）", quiz:{ sentence:"地価の下落が＿＿＿となって、中高年層の都心回帰が進んでいる。", options:["巻き返し","暗礁に乗り上げる","糸口","追い風"], correct:3 } },
+    { id:"id-9", term:"大台", meaning:"mốc lớn (về số lượng/tiền)", explain:"Nghĩa: mốc lớn (về số lượng/tiền). Ví dụ khác trong sách: 「社長は年頭のスピーチで、年間売上高を100億円の＿＿＿に乗せる目標を掲げた。」（đáp án: 大台）", quiz:{ sentence:"原油価格は供給面の不安から、50ドルの＿＿＿を越えてからも下がる気配がない。", options:["後押し","しわ寄せ","大台","兆し"], correct:2 } },
+    { id:"id-10", term:"大詰め", meaning:"giai đoạn cuối cùng, chung cuộc", explain:"Nghĩa: giai đoạn cuối cùng, chung cuộc. Ví dụ khác trong sách: 「両社の業務提携交渉は、＿＿＿の協議で合意に至らず、決裂した。」（đáp án: 大詰め）", quiz:{ sentence:"長期にわたった二国間の交渉は、ようやく問題解決にむけて＿＿＿の段階に入った。", options:["大台","引き金","大詰め","兆し"], correct:2 } },
+    { id:"id-11", term:"活路", meaning:"lối thoát, con đường sống", explain:"Nghĩa: lối thoát, con đường sống. Ví dụ khác trong sách: 「不況の続く建設関連各社は、マンションリフォームに＿＿＿を求めている。」（đáp án: 活路）", quiz:{ sentence:"E社は売上不振の繊維部門を大幅に縮小し、化粧品事業に＿＿＿を見いだした。", options:["呼び水","切り札","引けを取る","活路"], correct:3 } },
+    { id:"id-12", term:"兆し", meaning:"dấu hiệu, điềm báo", explain:"Nghĩa: dấu hiệu, điềm báo. Ví dụ khác trong sách: 「長らく景気の横ばいが続き、踊り場脱却の＿＿＿はなかなか見えてこない。」（đáp án: 兆し）", quiz:{ sentence:"低迷を続けた日本経済も、ようやく回復の＿＿＿が見えてきた。", options:["目白押し","兆し","本腰","巻き返し"], correct:1 } },
+    { id:"id-13", term:"切り札", meaning:"con bài tẩy, phương án cuối", explain:"Nghĩa: con bài tẩy, phương án cuối. Ví dụ khác trong sách: 「いざとなれば特許契約の解除という＿＿＿があるから、交渉はこちらが有利だろう。」（đáp án: 切り札）", quiz:{ sentence:"Y社は経営再建の最後の＿＿＿として、関連会社の売却を決定した。", options:["目白押し","切り札","先手を打つ","追い風"], correct:1 } },
+    { id:"id-14", term:"脚光を浴びる", meaning:"được chú ý, nổi bật lên", explain:"Nghĩa: được chú ý, nổi bật lên. Ví dụ khác trong sách: 「かつて半導体技術で＿＿＿Z社が、新CPUで新たな挑戦を始めた。」（đáp án: 脚光を浴びる）", quiz:{ sentence:"インドのB市は今、半導体の新興市場として＿＿＿いる。", options:["脚光を浴びる","うなぎ登り","水をあける","瀬戸際"], correct:0 } },
+    { id:"id-15", term:"公算", meaning:"khả năng, xác suất", explain:"Nghĩa: khả năng, xác suất. Ví dụ khác trong sách: 「駅前ショッピングセンターの建設は、D社が落札する＿＿＿が強い。」（đáp án: 公算）", quiz:{ sentence:"知的財産権をめぐるトラブルで、A社はB社との技術提携契約を白紙に戻す＿＿＿が出てきた。", options:["水をあける","正念場","頭打ち","公算"], correct:3 } },
+    { id:"id-16", term:"試金石", meaning:"hòn đá thử vàng, phép thử", explain:"Nghĩa: hòn đá thử vàng, phép thử. Ví dụ khác trong sách: 「今度の欠陥商品問題は、経営再建後のH社経営陣にとって新たな＿＿＿となった。」（đáp án: 試金石）", quiz:{ sentence:"X社との共同プロジェクトは、P社のグローバル路線の成否を占う＿＿＿と見られている。", options:["試金石","糸口","本腰","足がかり"], correct:0 } },
+    { id:"id-17", term:"正念場", meaning:"thời khắc quyết định", explain:"Nghĩa: thời khắc quyết định. Ví dụ khác trong sách: 「不良債権回収後の金融機関にとって、本業で収益を上げなければならないこれからが＿＿＿といえる。」（đáp án: 正念場）", quiz:{ sentence:"同業各社の新規参入が続く中、C社の中国進出は＿＿＿を迎えている。", options:["正念場","引けを取る","足がかり","兆し"], correct:0 } },
+    { id:"id-18", term:"しわ寄せ", meaning:"hệ quả dồn lại, gánh chịu ảnh hưởng", explain:"Nghĩa: hệ quả dồn lại, gánh chịu ảnh hưởng. Ví dụ khác trong sách: 「経営不振の＿＿＿で、中高年社員の大幅なリストラが行われた。」（đáp án: しわ寄せ）", quiz:{ sentence:"大幅な研究予算削減の結果、地道な基礎研究部門に＿＿＿が来ている。", options:["しわ寄せ","巻き返し","すそ野","本腰"], correct:0 } },
+    { id:"id-19", term:"すそ野", meaning:"phạm vi ảnh hưởng lan rộng", explain:"Nghĩa: phạm vi ảnh hưởng lan rộng. Ví dụ khác trong sách: 「操作の簡単な機種の登場により、携帯電話利用者の＿＿＿が拡大している。」（đáp án: すそ野）", quiz:{ sentence:"素材・デザイン等様々な分野の技術を必要とする自動車産業は、＿＿＿が広い産業と言われている。", options:["すそ野","うなぎ登り","兆し","赤が出る"], correct:0 } },
+    { id:"id-20", term:"瀬戸際", meaning:"ranh giới sinh tử, bờ vực", explain:"Nghĩa: ranh giới sinh tử, bờ vực. Ví dụ khác trong sách: 「I社は粉飾決算が明らかになり、上場廃止の＿＿＿に追い込まれた。」（đáp án: 瀬戸際）", quiz:{ sentence:"来期の売上次第では、わが社は倒産の＿＿＿に立たされることも考えられる。", options:["瀬戸際","糸口","しわ寄せ","公算"], correct:0 } },
+    { id:"id-21", term:"先手を打つ", meaning:"ra tay trước, chủ động đi trước", explain:"Nghĩa: ra tay trước, chủ động đi trước. Ví dụ khác trong sách: 「政府は、原油高騰が懸念される中、備蓄量の拡大を図ることで＿＿＿としている。」（đáp án: 先手を打つ）", quiz:{ sentence:"M社は広大な市場を持つ中国に、＿＿＿進出を図ろうとしている。", options:["跳ね上がる","引けを取る","先手を打つ","足がかり"], correct:2 } },
+    { id:"id-22", term:"軒並み", meaning:"đồng loạt, hàng loạt", explain:"Nghĩa: đồng loạt, hàng loạt. Ví dụ khác trong sách: 「経済の回復により、IT業界が＿＿＿息を吹き返している。」（đáp án: 軒並み）", quiz:{ sentence:"冷夏のあおりを受けて、家電業界は＿＿＿前年の売上を下回った。", options:["目白押し","大台","公算","軒並み"], correct:3 } },
+    { id:"id-23", term:"歯止め", meaning:"phanh hãm, chặn đà", explain:"Nghĩa: phanh hãm, chặn đà. Ví dụ khác trong sách: 「小売店での値下げ競争に＿＿＿がかからず、業界全体の収益はかつてない落ち込みとなった。」（đáp án: 歯止め）", quiz:{ sentence:"Dデパートは販売戦略の大幅な見直しにより、客離れに＿＿＿をかけた。", options:["巻き返し","歯止め","呼び水","暗礁に乗り上げる"], correct:1 } },
+    { id:"id-24", term:"跳ね上がる", meaning:"tăng vọt bất ngờ", explain:"Nghĩa: tăng vọt bất ngờ. Ví dụ khác trong sách: 「都心の高層ビル建築ラッシュで、地価が＿＿＿。」（đáp án: 跳ね上がる）", quiz:{ sentence:"DVD新製品発表と同時に、X社の株価が＿＿＿。", options:["跳ね上がる","兆し","暗礁に乗り上げる","呼び水"], correct:0 } },
+    { id:"id-25", term:"引き金", meaning:"ngòi nổ, nguyên nhân trực tiếp", explain:"Nghĩa: ngòi nổ, nguyên nhân trực tiếp. Ví dụ khác trong sách: 「石油の値上げが物価上昇の＿＿＿となった。」（đáp án: 引き金）", quiz:{ sentence:"学生や労働者のデモが＿＿＿となって暴動が起きた。", options:["引き金","公算","本腰","巻き返し"], correct:0 } },
+    { id:"id-26", term:"引けを取る", meaning:"thua kém, kém cạnh", explain:"Nghĩa: thua kém, kém cạnh. Ví dụ khác trong sách: 「わが社はアフターサービスの点では、どこにも＿＿＿ない自信がある。」（đáp án: 引けを取る）", quiz:{ sentence:"彼は法律の実務においては、誰にも＿＿＿ない。", options:["切り札","呼び水","引けを取る","すそ野"], correct:2 } },
+    { id:"id-27", term:"踏み切る", meaning:"quyết định dứt khoát, hạ quyết tâm", explain:"Nghĩa: quyết định dứt khoát, hạ quyết tâm. Ví dụ khác trong sách: 「円安で原料コストが上がったため、製品の値上げに＿＿＿ざるをえない。」（đáp án: 踏み切る）", quiz:{ sentence:"新製品の売れ行きが好調なため、G社は新工場の建設に＿＿＿。", options:["呼び水","活路","踏み切る","脚光を浴びる"], correct:2 } },
+    { id:"id-28", term:"本腰", meaning:"dốc toàn lực, nghiêm túc bắt tay vào", explain:"Nghĩa: dốc toàn lực, nghiêm túc bắt tay vào. Ví dụ khác trong sách: 「試験まであと1ヶ月となり、Bさんは＿＿＿を入れて勉強し始めた。」（đáp án: 本腰）", quiz:{ sentence:"地球温暖化対策に、多くの国が＿＿＿を入れて取り組み始めた。", options:["本腰","頭打ち","大台","水をあける"], correct:0 } },
+    { id:"id-29", term:"巻き返し", meaning:"phản công, lội ngược dòng", explain:"Nghĩa: phản công, lội ngược dòng. Ví dụ khác trong sách: 「米国進出に遅れをとっていたA社は、＿＿＿を図るために米国企業を買収した。」（đáp án: 巻き返し）", quiz:{ sentence:"C社は、新製品の開発により売上低迷の＿＿＿を図ろうとしている。", options:["巻き返し","正念場","先手を打つ","しわ寄せ"], correct:0 } },
+    { id:"id-30", term:"水をあける", meaning:"bỏ xa, nới rộng khoảng cách", explain:"Nghĩa: bỏ xa, nới rộng khoảng cách. Ví dụ khác trong sách: 「設備投資の立ち遅れが原因で、ライバル会社に＿＿＿られた。」（đáp án: 水をあける）", quiz:{ sentence:"新商品のヒットによって、今期の売上では他社に大きく＿＿＿ことができた。", options:["軒並み","糸口","水をあける","すそ野"], correct:2 } },
+    { id:"id-31", term:"目白押し", meaning:"dồn dập, nối đuôi nhau xếp hàng", explain:"Nghĩa: dồn dập, nối đuôi nhau xếp hàng. Ví dụ khác trong sách: 「都心では、新たな開発計画が＿＿＿だ。」（đáp án: 目白押し）", quiz:{ sentence:"景気の回復にともなって、金融関係の新商品が＿＿＿した。", options:["瀬戸際","歯止め","目白押し","跳ね上がる"], correct:2 } },
+    { id:"id-32", term:"呼び水", meaning:"chất xúc tác, mồi (khởi phát điều gì)", explain:"Nghĩa: chất xúc tác, mồi (khởi phát điều gì). Ví dụ khác trong sách: 「積極的な減税措置が＿＿＿となって、急速に景気が回復した。」（đáp án: 呼び水）", quiz:{ sentence:"ビールの値上げが＿＿＿となって、発泡酒の市場が急拡大した。", options:["うなぎ登り","呼び水","活路","正念場"], correct:1 } },
+  ];
+
+  const KATAKANA_ITEMS = [
+    { id:"kk-0", term:"アウトソーシング", meaning:"outsourcing", explain:"outsourcing", quiz:{ mode:'meaning', term:"アウトソーシング", options:["outlet","draft","channel","outsourcing"], correct:3 } },
+    { id:"kk-1", term:"アポ（イント）", meaning:"appointment", explain:"appointment", quiz:{ mode:'meaning', term:"アポ（イント）", options:["appointment","cancel","top","top-down"], correct:0 } },
+    { id:"kk-2", term:"アルバイト", meaning:"arbeit (tiếng Đức)", explain:"arbeit (tiếng Đức)", quiz:{ mode:'meaning', term:"アルバイト", options:["data","part-timer","sub-","arbeit (tiếng Đức)"], correct:3 } },
+    { id:"kk-3", term:"クライアント", meaning:"client", explain:"client", quiz:{ mode:'meaning', term:"クライアント", options:["customer","client","chief","gross"], correct:1 } },
+    { id:"kk-4", term:"グローバル", meaning:"global", explain:"global", quiz:{ mode:'meaning', term:"グローバル", options:["global","marketing","broad band","maker"], correct:0 } },
+    { id:"kk-5", term:"シフト", meaning:"shift", explain:"shift", quiz:{ mode:'meaning', term:"シフト", options:["concept","client","support","shift"], correct:3 } },
+    { id:"kk-6", term:"スタッフ", meaning:"staff", explain:"staff", quiz:{ mode:'meaning', term:"スタッフ", options:["staff","maintenance","cost","maker"], correct:0 } },
+    { id:"kk-7", term:"セールス", meaning:"sales", explain:"sales", quiz:{ mode:'meaning', term:"セールス", options:["internet","risk","sales","global"], correct:2 } },
+    { id:"kk-8", term:"セキュリティー", meaning:"security", explain:"security", quiz:{ mode:'meaning', term:"セキュリティー", options:["security","appointment","contents","top-down"], correct:0 } },
+    { id:"kk-9", term:"チーフ", meaning:"chief", explain:"chief", quiz:{ mode:'meaning', term:"チーフ", options:["manual","net","pamphlet","chief"], correct:3 } },
+    { id:"kk-10", term:"チーム", meaning:"team", explain:"team", quiz:{ mode:'meaning', term:"チーム", options:["demerit","team","merit","percent"], correct:1 } },
+    { id:"kk-11", term:"テナント", meaning:"tenant", explain:"tenant", quiz:{ mode:'meaning', term:"テナント", options:["sales","know-how","tenant","potential"], correct:2 } },
+    { id:"kk-12", term:"デモ（ンストレーション）", meaning:"demonstration", explain:"demonstration", quiz:{ mode:'meaning', term:"デモ（ンストレーション）", options:["system","flextime","compliance","demonstration"], correct:3 } },
+    { id:"kk-13", term:"トップ", meaning:"top", explain:"top", quiz:{ mode:'meaning', term:"トップ", options:["top-down","demonstration","user","top"], correct:3 } },
+    { id:"kk-14", term:"トップダウン", meaning:"top-down", explain:"top-down", quiz:{ mode:'meaning', term:"トップダウン", options:["presentation","channel","sub-","top-down"], correct:3 } },
+    { id:"kk-15", term:"ニッチ", meaning:"niche", explain:"niche", quiz:{ mode:'meaning', term:"ニッチ", options:["cost","norma（ロシア語）","technology","niche"], correct:3 } },
+    { id:"kk-16", term:"パート", meaning:"part-timer", explain:"part-timer", quiz:{ mode:'meaning', term:"パート", options:["market","part-timer","trouble","catalog"], correct:1 } },
+    { id:"kk-17", term:"プレゼン（テーション）", meaning:"presentation", explain:"presentation", quiz:{ mode:'meaning', term:"プレゼン（テーション）", options:["chief","presentation","consensus","management"], correct:1 } },
+    { id:"kk-18", term:"フレックス（タイム）", meaning:"flextime", explain:"flextime", quiz:{ mode:'meaning', term:"フレックス（タイム）", options:["campaign","team","parts","flextime"], correct:3 } },
+    { id:"kk-19", term:"プロジェクト", meaning:"project", explain:"project", quiz:{ mode:'meaning', term:"プロジェクト", options:["venture","project","tenant","trouble"], correct:1 } },
+    { id:"kk-20", term:"ベンチャー", meaning:"venture", explain:"venture", quiz:{ mode:'meaning', term:"ベンチャー", options:["venture","client","trouble","team"], correct:0 } },
+    { id:"kk-21", term:"ボトムアップ", meaning:"bottom up", explain:"bottom up", quiz:{ mode:'meaning', term:"ボトムアップ", options:["bottom up","global","cost","potential"], correct:0 } },
+    { id:"kk-22", term:"マネージメント", meaning:"management", explain:"management", quiz:{ mode:'meaning', term:"マネージメント", options:["management","display","staff","bottom up"], correct:0 } },
+    { id:"kk-23", term:"マネージャー", meaning:"manager", explain:"manager", quiz:{ mode:'meaning', term:"マネージャー", options:["tenant","hybrid","manager","merit"], correct:2 } },
+    { id:"kk-24", term:"マンパワー", meaning:"man power", explain:"man power", quiz:{ mode:'meaning', term:"マンパワー", options:["top","share","lease","man power"], correct:3 } },
+    { id:"kk-25", term:"メーカー", meaning:"maker", explain:"maker", quiz:{ mode:'meaning', term:"メーカー", options:["man power","management","maker","system"], correct:2 } },
+    { id:"kk-26", term:"リーダー", meaning:"leader", explain:"leader", quiz:{ mode:'meaning', term:"リーダー", options:["cost performance","pending","leader","niche"], correct:2 } },
+    { id:"kk-27", term:"リストラ", meaning:"restructuring", explain:"restructuring", quiz:{ mode:'meaning', term:"リストラ", options:["pamphlet","restructuring","arbeit (tiếng Đức)","niche"], correct:1 } },
+    { id:"kk-28", term:"インフレ（ーション）", meaning:"inflation", explain:"inflation", quiz:{ mode:'meaning', term:"インフレ（ーション）", options:["user","restructuring","logo","inflation"], correct:3 } },
+    { id:"kk-29", term:"コスト", meaning:"cost", explain:"cost", quiz:{ mode:'meaning', term:"コスト", options:["buyer","cost","bottom up","concept"], correct:1 } },
+    { id:"kk-30", term:"シェア", meaning:"share", explain:"share", quiz:{ mode:'meaning', term:"シェア", options:["bubble","user","share","pamphlet"], correct:2 } },
+    { id:"kk-31", term:"デフレ（ーション）", meaning:"deflation", explain:"deflation", quiz:{ mode:'meaning', term:"デフレ（ーション）", options:["cost","deflation","system","compliance"], correct:1 } },
+    { id:"kk-32", term:"マーケット", meaning:"market", explain:"market", quiz:{ mode:'meaning', term:"マーケット", options:["market","hit","line","staff"], correct:0 } },
+    { id:"kk-33", term:"アナログ", meaning:"analog", explain:"analog", quiz:{ mode:'meaning', term:"アナログ", options:["bubble","analog","main","consensus"], correct:1 } },
+    { id:"kk-34", term:"（インター）ネット", meaning:"internet", explain:"internet", quiz:{ mode:'meaning', term:"（インター）ネット", options:["top","logo","customize","internet"], correct:3 } },
+    { id:"kk-35", term:"ディスプレー", meaning:"display", explain:"display", quiz:{ mode:'meaning', term:"ディスプレー", options:["high-tech","leader","display","main"], correct:2 } },
+    { id:"kk-36", term:"テクノロジー", meaning:"technology", explain:"technology", quiz:{ mode:'meaning', term:"テクノロジー", options:["technology","target","presentation","pamphlet"], correct:0 } },
+    { id:"kk-37", term:"デジタル", meaning:"digital", explain:"digital", quiz:{ mode:'meaning', term:"デジタル", options:["chief","broad band","rental","digital"], correct:3 } },
+    { id:"kk-38", term:"ハイテク", meaning:"high-tech", explain:"high-tech", quiz:{ mode:'meaning', term:"ハイテク", options:["high-tech","cancel","needs","buyer"], correct:0 } },
+    { id:"kk-39", term:"ハイブリッド", meaning:"hybrid", explain:"hybrid", quiz:{ mode:'meaning', term:"ハイブリッド", options:["hybrid","team","logo","demerit"], correct:0 } },
+    { id:"kk-40", term:"ブロードバンド", meaning:"broad band", explain:"broad band", quiz:{ mode:'meaning', term:"ブロードバンド", options:["system","broad band","share","risk"], correct:1 } },
+    { id:"kk-41", term:"メガビット", meaning:"megabit", explain:"megabit", quiz:{ mode:'meaning', term:"メガビット", options:["megabit","broad band","bubble","line"], correct:0 } },
+    { id:"kk-42", term:"モバイル", meaning:"mobile", explain:"mobile", quiz:{ mode:'meaning', term:"モバイル", options:["pamphlet","package","mobile","gross"], correct:2 } },
+    { id:"kk-43", term:"ログイン", meaning:"log in", explain:"log in", quiz:{ mode:'meaning', term:"ログイン", options:["technology","log in","staff","presentation"], correct:1 } },
+    { id:"kk-44", term:"アフターサービス", meaning:"after-sales service", explain:"after-sales service", quiz:{ mode:'meaning', term:"アフターサービス", options:["franchise chain","user","technology","after-sales service"], correct:3 } },
+    { id:"kk-45", term:"アウトレット", meaning:"outlet", explain:"outlet", quiz:{ mode:'meaning', term:"アウトレット", options:["needs","outlet","appointment","potential"], correct:1 } },
+    { id:"kk-46", term:"オーダー", meaning:"order", explain:"order", quiz:{ mode:'meaning', term:"オーダー", options:["share","order","catalog","channel"], correct:1 } },
+    { id:"kk-47", term:"カスタマー", meaning:"customer", explain:"customer", quiz:{ mode:'meaning', term:"カスタマー", options:["customer","draft","broad band","merit"], correct:0 } },
+    { id:"kk-48", term:"カスタマイズ", meaning:"customize", explain:"customize", quiz:{ mode:'meaning', term:"カスタマイズ", options:["know-how","customize","main","bottom up"], correct:1 } },
+    { id:"kk-49", term:"カタログ", meaning:"catalog", explain:"catalog", quiz:{ mode:'meaning', term:"カタログ", options:["catalog","security","market","stock"], correct:0 } },
+    { id:"kk-50", term:"キャンペーン", meaning:"campaign", explain:"campaign", quiz:{ mode:'meaning', term:"キャンペーン", options:["user","contents","campaign","bubble"], correct:2 } },
+    { id:"kk-51", term:"クレーム", meaning:"claim", explain:"claim", quiz:{ mode:'meaning', term:"クレーム", options:["arbeit (tiếng Đức)","marketing","claim","rental"], correct:2 } },
+    { id:"kk-52", term:"グロス", meaning:"gross", explain:"gross", quiz:{ mode:'meaning', term:"グロス", options:["after-sales service","package","gross","hybrid"], correct:2 } },
+    { id:"kk-53", term:"コストパフォーマンス", meaning:"cost performance", explain:"cost performance", quiz:{ mode:'meaning', term:"コストパフォーマンス", options:["cost performance","rental","percent","tenant"], correct:0 } },
+    { id:"kk-54", term:"コンテンツ", meaning:"contents", explain:"contents", quiz:{ mode:'meaning', term:"コンテンツ", options:["line","client","project","contents"], correct:3 } },
+    { id:"kk-55", term:"サンプル", meaning:"sample", explain:"sample", quiz:{ mode:'meaning', term:"サンプル", options:["sample","customize","contents","internet"], correct:0 } },
+    { id:"kk-56", term:"ストック", meaning:"stock", explain:"stock", quiz:{ mode:'meaning', term:"ストック", options:["stock","logo","outsourcing","line"], correct:0 } },
+    { id:"kk-57", term:"ターゲット", meaning:"target", explain:"target", quiz:{ mode:'meaning', term:"ターゲット", options:["share","risk","merit","target"], correct:3 } },
+    { id:"kk-58", term:"チェーン（ストア）", meaning:"chain store", explain:"chain store", quiz:{ mode:'meaning', term:"チェーン（ストア）", options:["pending","chain store","parts","event"], correct:1 } },
+    { id:"kk-59", term:"チャネル", meaning:"channel", explain:"channel", quiz:{ mode:'meaning', term:"チャネル", options:["manager","recycle","trouble","channel"], correct:3 } },
+    { id:"kk-60", term:"ニーズ", meaning:"needs", explain:"needs", quiz:{ mode:'meaning', term:"ニーズ", options:["maker","needs","market","hit"], correct:1 } },
+    { id:"kk-61", term:"ネット", meaning:"net", explain:"net", quiz:{ mode:'meaning', term:"ネット", options:["net","security","leader","presentation"], correct:0 } },
+    { id:"kk-62", term:"バージョン", meaning:"version", explain:"version", quiz:{ mode:'meaning', term:"バージョン", options:["trouble","version","bottom up","claim"], correct:1 } },
+    { id:"kk-63", term:"パーツ", meaning:"parts", explain:"parts", quiz:{ mode:'meaning', term:"パーツ", options:["market","part-timer","parts","enquête（フランス語）"], correct:2 } },
+    { id:"kk-64", term:"バイヤー", meaning:"buyer", explain:"buyer", quiz:{ mode:'meaning', term:"バイヤー", options:["share","buyer","logo","package"], correct:1 } },
+    { id:"kk-65", term:"パッケージ", meaning:"package", explain:"package", quiz:{ mode:'meaning', term:"パッケージ", options:["market","manual","team","package"], correct:3 } },
+    { id:"kk-66", term:"パンフ（レット）", meaning:"pamphlet", explain:"pamphlet", quiz:{ mode:'meaning', term:"パンフ（レット）", options:["recall","pamphlet","client","franchise chain"], correct:1 } },
+    { id:"kk-67", term:"ヒット", meaning:"hit", explain:"hit", quiz:{ mode:'meaning', term:"ヒット", options:["top-down","manual","compliance","hit"], correct:3 } },
+    { id:"kk-68", term:"フランチャイズ（チェーン）", meaning:"franchise chain", explain:"franchise chain", quiz:{ mode:'meaning', term:"フランチャイズ（チェーン）", options:["franchise chain","niche","digital","parts"], correct:0 } },
+    { id:"kk-69", term:"ブランド", meaning:"brand", explain:"brand", quiz:{ mode:'meaning', term:"ブランド", options:["brand","lot","rental","bubble"], correct:0 } },
+    { id:"kk-70", term:"マーケティング", meaning:"marketing", explain:"marketing", quiz:{ mode:'meaning', term:"マーケティング", options:["marketing","lot","arbeit (tiếng Đức)","bottom up"], correct:0 } },
+    { id:"kk-71", term:"メンテ（ナンス）", meaning:"maintenance", explain:"maintenance", quiz:{ mode:'meaning', term:"メンテ（ナンス）", options:["digital","maintenance","log in","campaign"], correct:1 } },
+    { id:"kk-72", term:"ユーザー", meaning:"user", explain:"user", quiz:{ mode:'meaning', term:"ユーザー", options:["top","franchise chain","user","bubble"], correct:2 } },
+    { id:"kk-73", term:"ライン", meaning:"line", explain:"line", quiz:{ mode:'meaning', term:"ライン", options:["analog","line","hit","niche"], correct:1 } },
+    { id:"kk-74", term:"リコール", meaning:"recall", explain:"recall", quiz:{ mode:'meaning', term:"リコール", options:["draft","deflation","niche","recall"], correct:3 } },
+    { id:"kk-75", term:"ロット", meaning:"lot", explain:"lot", quiz:{ mode:'meaning', term:"ロット", options:["merit","shift","lot","presentation"], correct:2 } },
+    { id:"kk-76", term:"アンケート", meaning:"enquête（フランス語）", explain:"enquête（フランス語）", quiz:{ mode:'meaning', term:"アンケート", options:["event","manager","enquête（フランス語）","global"], correct:2 } },
+    { id:"kk-77", term:"イベント", meaning:"event", explain:"event", quiz:{ mode:'meaning', term:"イベント", options:["event","after-sales service","deflation","digital"], correct:0 } },
+    { id:"kk-78", term:"キャンセル", meaning:"cancel", explain:"cancel", quiz:{ mode:'meaning', term:"キャンセル", options:["demonstration","gross","deflation","cancel"], correct:3 } },
+    { id:"kk-79", term:"コンセプト", meaning:"concept", explain:"concept", quiz:{ mode:'meaning', term:"コンセプト", options:["concept","event","part-timer","outsourcing"], correct:0 } },
+    { id:"kk-80", term:"コンセンサス", meaning:"consensus", explain:"consensus", quiz:{ mode:'meaning', term:"コンセンサス", options:["enquête（フランス語）","niche","consensus","hit"], correct:2 } },
+    { id:"kk-81", term:"コンプライアンス", meaning:"compliance", explain:"compliance", quiz:{ mode:'meaning', term:"コンプライアンス", options:["lot","net","inflation","compliance"], correct:3 } },
+    { id:"kk-82", term:"サブ", meaning:"sub-", explain:"sub-", quiz:{ mode:'meaning', term:"サブ", options:["technology","sub-","system","logo"], correct:1 } },
+    { id:"kk-83", term:"サポート", meaning:"support", explain:"support", quiz:{ mode:'meaning', term:"サポート", options:["bubble","concept","support","recall"], correct:2 } },
+    { id:"kk-84", term:"システム", meaning:"system", explain:"system", quiz:{ mode:'meaning', term:"システム", options:["order","outsourcing","system","consensus"], correct:2 } },
+    { id:"kk-85", term:"データ", meaning:"data", explain:"data", quiz:{ mode:'meaning', term:"データ", options:["appointment","cost performance","global","data"], correct:3 } },
+    { id:"kk-86", term:"デメリット", meaning:"demerit", explain:"demerit", quiz:{ mode:'meaning', term:"デメリット", options:["percent","demerit","shift","maker"], correct:1 } },
+    { id:"kk-87", term:"ドラフト", meaning:"draft", explain:"draft", quiz:{ mode:'meaning', term:"ドラフト", options:["hybrid","draft","catalog","man power"], correct:1 } },
+    { id:"kk-88", term:"トラブル", meaning:"trouble", explain:"trouble", quiz:{ mode:'meaning', term:"トラブル", options:["staff","norma（ロシア語）","logo","trouble"], correct:3 } },
+    { id:"kk-89", term:"ノウハウ", meaning:"know-how", explain:"know-how", quiz:{ mode:'meaning', term:"ノウハウ", options:["sub-","know-how","recall","event"], correct:1 } },
+    { id:"kk-90", term:"ノルマ", meaning:"norma（ロシア語）", explain:"norma（ロシア語）", quiz:{ mode:'meaning', term:"ノルマ", options:["trouble","norma（ロシア語）","restructuring","system"], correct:1 } },
+    { id:"kk-91", term:"パー（セント）", meaning:"percent", explain:"percent", quiz:{ mode:'meaning', term:"パー（セント）", options:["share","percent","channel","display"], correct:1 } },
+    { id:"kk-92", term:"バブル", meaning:"bubble", explain:"bubble", quiz:{ mode:'meaning', term:"バブル", options:["main","top","package","bubble"], correct:3 } },
+    { id:"kk-93", term:"ペンディング", meaning:"pending", explain:"pending", quiz:{ mode:'meaning', term:"ペンディング", options:["client","pending","mobile","maker"], correct:1 } },
+    { id:"kk-94", term:"ポテンシャル", meaning:"potential", explain:"potential", quiz:{ mode:'meaning', term:"ポテンシャル", options:["potential","shift","manager","bottom up"], correct:0 } },
+    { id:"kk-95", term:"ボリューム", meaning:"volume", explain:"volume", quiz:{ mode:'meaning', term:"ボリューム", options:["sub-","man power","norma（ロシア語）","volume"], correct:3 } },
+    { id:"kk-96", term:"マニュアル", meaning:"manual", explain:"manual", quiz:{ mode:'meaning', term:"マニュアル", options:["cancel","leader","manual","order"], correct:2 } },
+    { id:"kk-97", term:"メイン", meaning:"main", explain:"main", quiz:{ mode:'meaning', term:"メイン", options:["rental","main","leader","analog"], correct:1 } },
+    { id:"kk-98", term:"メリット", meaning:"merit", explain:"merit", quiz:{ mode:'meaning', term:"メリット", options:["merit","top","net","man power"], correct:0 } },
+    { id:"kk-99", term:"ライセンス", meaning:"license", explain:"license", quiz:{ mode:'meaning', term:"ライセンス", options:["license","niche","data","support"], correct:0 } },
+    { id:"kk-100", term:"リース", meaning:"lease", explain:"lease", quiz:{ mode:'meaning', term:"リース", options:["franchise chain","risk","lease","high-tech"], correct:2 } },
+    { id:"kk-101", term:"リサイクル", meaning:"recycle", explain:"recycle", quiz:{ mode:'meaning', term:"リサイクル", options:["enquête（フランス語）","recycle","main","internet"], correct:1 } },
+    { id:"kk-102", term:"リスク", meaning:"risk", explain:"risk", quiz:{ mode:'meaning', term:"リスク", options:["line","risk","display","sales"], correct:1 } },
+    { id:"kk-103", term:"レンタル", meaning:"rental", explain:"rental", quiz:{ mode:'meaning', term:"レンタル", options:["rental","potential","staff","after-sales service"], correct:0 } },
+    { id:"kk-104", term:"ロゴ", meaning:"logo", explain:"logo", quiz:{ mode:'meaning', term:"ロゴ", options:["logo","recycle","staff","outlet"], correct:0 } },
+  ];
+
+  const GYOSEKI_ITEMS = [
+    { id:"gy-0", term:"決算", meaning:"quyết toán tài chính cuối kỳ — công bố 1 lần/năm dựa trên 財務諸表", explain:"quyết toán tài chính cuối kỳ — công bố 1 lần/năm dựa trên 財務諸表", quiz:{ mode:'meaning', term:"決算", options:["quý (1/4 năm, 3 tháng)","xu hướng đi lên liên tục (kinh tế tăng trưởng đều)","quyết toán tài chính cuối kỳ — công bố 1 lần/năm dựa trên 財務諸表","tăng đột ngột, tăng nhanh"], correct:2 } },
+    { id:"gy-1", term:"業績", meaning:"thành tích kinh doanh (doanh số, lợi nhuận tăng hay giảm)", explain:"thành tích kinh doanh (doanh số, lợi nhuận tăng hay giảm)", quiz:{ mode:'meaning', term:"業績", options:["lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh","đỉnh chu kỳ kinh tế — trạng thái kinh tế tốt nhất","quý (1/4 năm, 3 tháng)","thành tích kinh doanh (doanh số, lợi nhuận tăng hay giảm)"], correct:3 } },
+    { id:"gy-2", term:"景況", meaning:"tình hình/trạng thái của nền kinh tế (景気)", explain:"tình hình/trạng thái của nền kinh tế (景気)", quiz:{ mode:'meaning', term:"景況", options:["tình hình/trạng thái của nền kinh tế (景気)","lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh","lợi nhuận kinh doanh = doanh số − giá vốn − chi phí bán hàng/quản lý","đi ngang, không tăng không giảm"], correct:0 } },
+    { id:"gy-3", term:"営業利益", meaning:"lợi nhuận kinh doanh = doanh số − giá vốn − chi phí bán hàng/quản lý", explain:"lợi nhuận kinh doanh = doanh số − giá vốn − chi phí bán hàng/quản lý", quiz:{ mode:'meaning', term:"営業利益", options:["lợi nhuận kinh doanh = doanh số − giá vốn − chi phí bán hàng/quản lý","tăng nhẹ, tăng ít","doanh số và lợi nhuận cùng giảm","quyết toán tài chính cuối kỳ — công bố 1 lần/năm dựa trên 財務諸表"], correct:0 } },
+    { id:"gy-4", term:"経常利益", meaning:"lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh", explain:"lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh", quiz:{ mode:'meaning', term:"経常利益", options:["lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh","giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)","lợi nhuận kinh doanh = doanh số − giá vốn − chi phí bán hàng/quản lý","doanh số và lợi nhuận cùng tăng"], correct:0 } },
+    { id:"gy-5", term:"四半期", meaning:"quý (1/4 năm, 3 tháng)", explain:"quý (1/4 năm, 3 tháng)", quiz:{ mode:'meaning', term:"四半期", options:["giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)","doanh số và lợi nhuận cùng giảm","tình hình/trạng thái của nền kinh tế (景気)","quý (1/4 năm, 3 tháng)"], correct:3 } },
+    { id:"gy-6", term:"増収増益", meaning:"doanh số và lợi nhuận cùng tăng", explain:"doanh số và lợi nhuận cùng tăng", quiz:{ mode:'meaning', term:"増収増益", options:["doanh số và lợi nhuận cùng giảm","tăng nhẹ, tăng ít","doanh số và lợi nhuận cùng tăng","đi ngang, không tăng không giảm"], correct:2 } },
+    { id:"gy-7", term:"減収減益", meaning:"doanh số và lợi nhuận cùng giảm", explain:"doanh số và lợi nhuận cùng giảm", quiz:{ mode:'meaning', term:"減収減益", options:["tăng đột ngột, tăng nhanh","lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh","doanh số và lợi nhuận cùng giảm","xu hướng đi lên liên tục (kinh tế tăng trưởng đều)"], correct:2 } },
+    { id:"gy-8", term:"急増", meaning:"tăng đột ngột, tăng nhanh", explain:"tăng đột ngột, tăng nhanh", quiz:{ mode:'meaning', term:"急増", options:["tăng nhẹ, tăng ít","giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)","tăng đột ngột, tăng nhanh","doanh số và lợi nhuận cùng giảm"], correct:2 } },
+    { id:"gy-9", term:"微増", meaning:"tăng nhẹ, tăng ít", explain:"tăng nhẹ, tăng ít", quiz:{ mode:'meaning', term:"微増", options:["đỉnh chu kỳ kinh tế — trạng thái kinh tế tốt nhất","thành tích kinh doanh (doanh số, lợi nhuận tăng hay giảm)","quý (1/4 năm, 3 tháng)","tăng nhẹ, tăng ít"], correct:3 } },
+    { id:"gy-10", term:"景気の山", meaning:"đỉnh chu kỳ kinh tế — trạng thái kinh tế tốt nhất", explain:"đỉnh chu kỳ kinh tế — trạng thái kinh tế tốt nhất", quiz:{ mode:'meaning', term:"景気の山", options:["đỉnh chu kỳ kinh tế — trạng thái kinh tế tốt nhất","tăng đột ngột, tăng nhanh","quyết toán tài chính cuối kỳ — công bố 1 lần/năm dựa trên 財務諸表","xu hướng đi lên liên tục (kinh tế tăng trưởng đều)"], correct:0 } },
+    { id:"gy-11", term:"右肩上がり", meaning:"xu hướng đi lên liên tục (kinh tế tăng trưởng đều)", explain:"xu hướng đi lên liên tục (kinh tế tăng trưởng đều)", quiz:{ mode:'meaning', term:"右肩上がり", options:["xu hướng đi lên liên tục (kinh tế tăng trưởng đều)","giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)","quyết toán tài chính cuối kỳ — công bố 1 lần/năm dựa trên 財務諸表","quý (1/4 năm, 3 tháng)"], correct:0 } },
+    { id:"gy-12", term:"踊り場", meaning:"giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)", explain:"giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)", quiz:{ mode:'meaning', term:"踊り場", options:["lợi nhuận kinh doanh = doanh số − giá vốn − chi phí bán hàng/quản lý","giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)","lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh","chạm đáy (kinh tế xuống đến mức thấp nhất rồi dừng)"], correct:1 } },
+    { id:"gy-13", term:"横ばい", meaning:"đi ngang, không tăng không giảm", explain:"đi ngang, không tăng không giảm", quiz:{ mode:'meaning', term:"横ばい", options:["đi ngang, không tăng không giảm","thành tích kinh doanh (doanh số, lợi nhuận tăng hay giảm)","lợi nhuận thường xuyên = 営業利益 + thu ngoài kinh doanh − chi ngoài kinh doanh","xu hướng đi lên liên tục (kinh tế tăng trưởng đều)"], correct:0 } },
+    { id:"gy-14", term:"底を打つ", meaning:"chạm đáy (kinh tế xuống đến mức thấp nhất rồi dừng)", explain:"chạm đáy (kinh tế xuống đến mức thấp nhất rồi dừng)", quiz:{ mode:'meaning', term:"底を打つ", options:["quý (1/4 năm, 3 tháng)","chạm đáy (kinh tế xuống đến mức thấp nhất rồi dừng)","tăng nhẹ, tăng ít","giai đoạn chững lại sau khi tăng (như chiếu nghỉ cầu thang)"], correct:1 } },
+  ];
+
+  const SHANAI_ITEMS = [
+    { id:"sn-0", term:"報告書", meaning:"văn bản báo cáo kết quả điều tra/nghiên cứu/công việc lên cấp trên (VD: 出張報告書, 営業日報)", explain:"văn bản báo cáo kết quả điều tra/nghiên cứu/công việc lên cấp trên (VD: 出張報告書, 営業日報)", quiz:{ mode:'meaning', term:"報告書", options:["(bên bán gửi) báo trước quy cách, giá, thời hạn giao hàng","(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng","văn bản báo cáo kết quả điều tra/nghiên cứu/công việc lên cấp trên (VD: 出張報告書, 営業日報)","văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng"], correct:2 } },
+    { id:"sn-1", term:"企画書", meaning:"văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)", explain:"văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)", quiz:{ mode:'meaning', term:"企画書", options:["đơn xin (VD: 住宅手当申請書 - đơn xin trợ cấp nhà ở)","văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)","đơn báo/thông báo (VD: 住所変更届)","(2 bên ký) thống nhất số lượng, quy cách, giá, điều kiện thanh toán"], correct:1 } },
+    { id:"sn-2", term:"決裁書・稟議書", meaning:"văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng", explain:"văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng", quiz:{ mode:'meaning', term:"決裁書・稟議書", options:["(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng","đơn xin nghỉ/thôi việc (VD: 休暇願, 退職願)","(bên bán gửi) báo trước quy cách, giá, thời hạn giao hàng","văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng"], correct:3 } },
+    { id:"sn-3", term:"議事録", meaning:"biên bản cuộc họp — ghi ngày giờ, địa điểm, người tham dự, nội dung, quyết định", explain:"biên bản cuộc họp — ghi ngày giờ, địa điểm, người tham dự, nội dung, quyết định", quiz:{ mode:'meaning', term:"議事録", options:["văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)","biên bản cuộc họp — ghi ngày giờ, địa điểm, người tham dự, nội dung, quyết định","(bên mua gửi) giải thích quy cách sản phẩm muốn mua","(bên bán gửi) báo trước quy cách, giá, thời hạn giao hàng"], correct:1 } },
+    { id:"sn-4", term:"〜申請書", meaning:"đơn xin (VD: 住宅手当申請書 - đơn xin trợ cấp nhà ở)", explain:"đơn xin (VD: 住宅手当申請書 - đơn xin trợ cấp nhà ở)", quiz:{ mode:'meaning', term:"〜申請書", options:["văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng","(bên bán gửi) yêu cầu thanh toán tiền hàng đã giao","đơn xin (VD: 住宅手当申請書 - đơn xin trợ cấp nhà ở)","(bên mua gửi) xác nhận đã nhận hàng"], correct:2 } },
+    { id:"sn-5", term:"〜願", meaning:"đơn xin nghỉ/thôi việc (VD: 休暇願, 退職願)", explain:"đơn xin nghỉ/thôi việc (VD: 休暇願, 退職願)", quiz:{ mode:'meaning', term:"〜願", options:["đơn xin nghỉ/thôi việc (VD: 休暇願, 退職願)","đơn báo/thông báo (VD: 住所変更届)","(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng","(2 bên ký) thống nhất số lượng, quy cách, giá, điều kiện thanh toán"], correct:0 } },
+    { id:"sn-6", term:"〜届", meaning:"đơn báo/thông báo (VD: 住所変更届)", explain:"đơn báo/thông báo (VD: 住所変更届)", quiz:{ mode:'meaning', term:"〜届", options:["(bên mua gửi) xác nhận đã nhận hàng","(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng","đơn báo/thông báo (VD: 住所変更届)","biên bản cuộc họp — ghi ngày giờ, địa điểm, người tham dự, nội dung, quyết định"], correct:2 } },
+    { id:"sn-7", term:"仕様書", meaning:"(bên mua gửi) giải thích quy cách sản phẩm muốn mua", explain:"(bên mua gửi) giải thích quy cách sản phẩm muốn mua", quiz:{ mode:'meaning', term:"仕様書", options:["văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)","đơn xin nghỉ/thôi việc (VD: 休暇願, 退職願)","(2 bên ký) thống nhất số lượng, quy cách, giá, điều kiện thanh toán","(bên mua gửi) giải thích quy cách sản phẩm muốn mua"], correct:3 } },
+    { id:"sn-8", term:"見積書", meaning:"(bên bán gửi) báo trước quy cách, giá, thời hạn giao hàng", explain:"(bên bán gửi) báo trước quy cách, giá, thời hạn giao hàng", quiz:{ mode:'meaning', term:"見積書", options:["(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa","(bên bán gửi) báo trước quy cách, giá, thời hạn giao hàng","văn bản báo cáo kết quả điều tra/nghiên cứu/công việc lên cấp trên (VD: 出張報告書, 営業日報)","biên bản cuộc họp — ghi ngày giờ, địa điểm, người tham dự, nội dung, quyết định"], correct:1 } },
+    { id:"sn-9", term:"売買契約書", meaning:"(2 bên ký) thống nhất số lượng, quy cách, giá, điều kiện thanh toán", explain:"(2 bên ký) thống nhất số lượng, quy cách, giá, điều kiện thanh toán", quiz:{ mode:'meaning', term:"売買契約書", options:["(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa","(bên bán gửi) yêu cầu thanh toán tiền hàng đã giao","(2 bên ký) thống nhất số lượng, quy cách, giá, điều kiện thanh toán","văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)"], correct:2 } },
+    { id:"sn-10", term:"注文書", meaning:"(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng", explain:"(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng", quiz:{ mode:'meaning', term:"注文書", options:["(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng","đơn xin (VD: 住宅手当申請書 - đơn xin trợ cấp nhà ở)","văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng","(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa"], correct:0 } },
+    { id:"sn-11", term:"納品書", meaning:"(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa", explain:"(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa", quiz:{ mode:'meaning', term:"納品書", options:["(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa","(bên mua gửi) giải thích quy cách sản phẩm muốn mua","biên bản cuộc họp — ghi ngày giờ, địa điểm, người tham dự, nội dung, quyết định","(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng"], correct:0 } },
+    { id:"sn-12", term:"受領書", meaning:"(bên mua gửi) xác nhận đã nhận hàng", explain:"(bên mua gửi) xác nhận đã nhận hàng", quiz:{ mode:'meaning', term:"受領書", options:["văn bản trình bày kế hoạch cho công việc mới (VD: 新製品企画書)","(bên bán gửi) yêu cầu thanh toán tiền hàng đã giao","(bên mua gửi) đặt hàng cụ thể dựa trên hợp đồng","(bên mua gửi) xác nhận đã nhận hàng"], correct:3 } },
+    { id:"sn-13", term:"請求書", meaning:"(bên bán gửi) yêu cầu thanh toán tiền hàng đã giao", explain:"(bên bán gửi) yêu cầu thanh toán tiền hàng đã giao", quiz:{ mode:'meaning', term:"請求書", options:["(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa","văn bản xin phê duyệt của người có thẩm quyền cho khoản chi lớn/việc quan trọng","đơn xin nghỉ/thôi việc (VD: 休暇願, 退職願)","(bên bán gửi) yêu cầu thanh toán tiền hàng đã giao"], correct:3 } },
+    { id:"sn-14", term:"領収書", meaning:"(bên bán gửi) xác nhận đã nhận được tiền thanh toán", explain:"(bên bán gửi) xác nhận đã nhận được tiền thanh toán", quiz:{ mode:'meaning', term:"領収書", options:["(bên bán gửi) xác nhận đã nhận được tiền thanh toán","(bên bán gửi) xác nhận đã giao hàng, kèm theo hàng hóa","đơn báo/thông báo (VD: 住所変更届)","(bên mua gửi) giải thích quy cách sản phẩm muốn mua"], correct:0 } },
+  ];
+
+  const TEIKEI_ITEMS = [
+    { id:"tk-0", term:"いつもお世話になっております。", meaning:"電話をかける", explain:"Tình huống dùng: 電話をかける", quiz:{ mode:'situation', term:"いつもお世話になっております。", options:["電話をかける","クレームを受ける","交渉をする","会社を訪問する"], correct:0 } },
+    { id:"tk-1", term:"○○様、いらっしゃいますか。", meaning:"電話をかける", explain:"Tình huống dùng: 電話をかける", quiz:{ mode:'situation', term:"○○様、いらっしゃいますか。", options:["電話をかける","交渉をする","会社を訪問する","電話を受ける"], correct:0 } },
+    { id:"tk-2", term:"○○は本日、休みをいただいております。", meaning:"電話を受ける", explain:"Tình huống dùng: 電話を受ける", quiz:{ mode:'situation', term:"○○は本日、休みをいただいております。", options:["交渉をする","電話を代わる","電話を受ける","会議をする"], correct:2 } },
+    { id:"tk-3", term:"○○はただいま、ほかの電話に出ております。", meaning:"電話を受ける", explain:"Tình huống dùng: 電話を受ける", quiz:{ mode:'situation', term:"○○はただいま、ほかの電話に出ております。", options:["電話を代わる","あいさつ（決まった言い方）","電話をかける","電話を受ける"], correct:3 } },
+    { id:"tk-4", term:"○○は、ちょっと席を外しております。", meaning:"電話を受ける", explain:"Tình huống dùng: 電話を受ける", quiz:{ mode:'situation', term:"○○は、ちょっと席を外しております。", options:["電話を受ける","あいさつ（決まった言い方）","クレームを受ける","交渉をする"], correct:0 } },
+    { id:"tk-5", term:"折り返し、お電話させていただきます。", meaning:"電話を受ける", explain:"Tình huống dùng: 電話を受ける", quiz:{ mode:'situation', term:"折り返し、お電話させていただきます。", options:["電話を受ける","電話をかける","あいさつ（決まった言い方）","交渉をする"], correct:0 } },
+    { id:"tk-6", term:"そのように申し伝えます。", meaning:"電話を受ける", explain:"Tình huống dùng: 電話を受ける", quiz:{ mode:'situation', term:"そのように申し伝えます。", options:["会議をする","会社を訪問する","あいさつ（決まった言い方）","電話を受ける"], correct:3 } },
+    { id:"tk-7", term:"お電話代わりました。", meaning:"電話を代わる", explain:"Tình huống dùng: 電話を代わる", quiz:{ mode:'situation', term:"お電話代わりました。", options:["会議をする","クレームを受ける","電話を代わる","電話をかける"], correct:2 } },
+    { id:"tk-8", term:"本日は、お忙しいところをお集まりいただき、ありがとうございます。", meaning:"会議をする", explain:"Tình huống dùng: 会議をする", quiz:{ mode:'situation', term:"本日は、お忙しいところをお集まりいただき、ありがとうございます。", options:["会議をする","会社を訪問する","あいさつ（決まった言い方）","クレームを受ける"], correct:0 } },
+    { id:"tk-9", term:"いろいろご意見を伺いたいと思っております。", meaning:"会議をする", explain:"Tình huống dùng: 会議をする", quiz:{ mode:'situation', term:"いろいろご意見を伺いたいと思っております。", options:["クレームを受ける","あいさつ（決まった言い方）","会議をする","電話を受ける"], correct:2 } },
+    { id:"tk-10", term:"お手元の資料をご覧ください。", meaning:"会議をする", explain:"Tình huống dùng: 会議をする", quiz:{ mode:'situation', term:"お手元の資料をご覧ください。", options:["会社を訪問する","電話をかける","会議をする","クレームを受ける"], correct:2 } },
+    { id:"tk-11", term:"何かご質問はございますか。", meaning:"会議をする", explain:"Tình huống dùng: 会議をする", quiz:{ mode:'situation', term:"何かご質問はございますか。", options:["クレームを受ける","電話を代わる","会議をする","あいさつ（決まった言い方）"], correct:2 } },
+    { id:"tk-12", term:"以上でよろしいでしょうか。", meaning:"会議をする", explain:"Tình huống dùng: 会議をする", quiz:{ mode:'situation', term:"以上でよろしいでしょうか。", options:["電話をかける","会社を訪問する","会議をする","あいさつ（決まった言い方）"], correct:2 } },
+    { id:"tk-13", term:"○○様にお取り次ぎ願えますでしょうか。", meaning:"会社を訪問する", explain:"Tình huống dùng: 会社を訪問する", quiz:{ mode:'situation', term:"○○様にお取り次ぎ願えますでしょうか。", options:["会社を訪問する","電話をかける","あいさつ（決まった言い方）","交渉をする"], correct:0 } },
+    { id:"tk-14", term:"（名刺を出しながら）○○でございます。よろしくお願いいたします。", meaning:"会社を訪問する", explain:"Tình huống dùng: 会社を訪問する", quiz:{ mode:'situation', term:"（名刺を出しながら）○○でございます。よろしくお願いいたします。", options:["クレームを受ける","交渉をする","会議をする","会社を訪問する"], correct:3 } },
+    { id:"tk-15", term:"（名刺を受け取りながら）ちょうだいいたします。", meaning:"会社を訪問する", explain:"Tình huống dùng: 会社を訪問する", quiz:{ mode:'situation', term:"（名刺を受け取りながら）ちょうだいいたします。", options:["電話を代わる","交渉をする","電話を受ける","会社を訪問する"], correct:3 } },
+    { id:"tk-16", term:"本日は、お時間をいただきまして、ありがとうございます。", meaning:"会社を訪問する", explain:"Tình huống dùng: 会社を訪問する", quiz:{ mode:'situation', term:"本日は、お時間をいただきまして、ありがとうございます。", options:["あいさつ（決まった言い方）","電話をかける","会社を訪問する","電話を代わる"], correct:2 } },
+    { id:"tk-17", term:"今後とも、どうぞよろしくお願いいたします。", meaning:"会社を訪問する", explain:"Tình huống dùng: 会社を訪問する", quiz:{ mode:'situation', term:"今後とも、どうぞよろしくお願いいたします。", options:["会社を訪問する","クレームを受ける","電話を代わる","あいさつ（決まった言い方）"], correct:0 } },
+    { id:"tk-18", term:"本日は、これで失礼させていただきます。", meaning:"会社を訪問する", explain:"Tình huống dùng: 会社を訪問する", quiz:{ mode:'situation', term:"本日は、これで失礼させていただきます。", options:["会議をする","交渉をする","電話を代わる","会社を訪問する"], correct:3 } },
+    { id:"tk-19", term:"大変ご迷惑をおかけしまして、申し訳ございません。", meaning:"クレームを受ける", explain:"Tình huống dùng: クレームを受ける", quiz:{ mode:'situation', term:"大変ご迷惑をおかけしまして、申し訳ございません。", options:["電話をかける","交渉をする","クレームを受ける","電話を代わる"], correct:2 } },
+    { id:"tk-20", term:"まことに申し訳ありません。すぐ調べまして、折り返しお電話いたします。", meaning:"クレームを受ける", explain:"Tình huống dùng: クレームを受ける", quiz:{ mode:'situation', term:"まことに申し訳ありません。すぐ調べまして、折り返しお電話いたします。", options:["会議をする","電話を受ける","会社を訪問する","クレームを受ける"], correct:3 } },
+    { id:"tk-21", term:"今後このようなことがないよう、十分注意いたします。", meaning:"クレームを受ける", explain:"Tình huống dùng: クレームを受ける", quiz:{ mode:'situation', term:"今後このようなことがないよう、十分注意いたします。", options:["会議をする","電話を代わる","クレームを受ける","電話をかける"], correct:2 } },
+    { id:"tk-22", term:"早速、本題に入らせていただきます。", meaning:"交渉をする", explain:"Tình huống dùng: 交渉をする", quiz:{ mode:'situation', term:"早速、本題に入らせていただきます。", options:["クレームを受ける","電話を受ける","あいさつ（決まった言い方）","交渉をする"], correct:3 } },
+    { id:"tk-23", term:"もう少し、何とかなりませんでしょうか。", meaning:"交渉をする", explain:"Tình huống dùng: 交渉をする", quiz:{ mode:'situation', term:"もう少し、何とかなりませんでしょうか。", options:["交渉をする","電話を受ける","電話をかける","クレームを受ける"], correct:0 } },
+    { id:"tk-24", term:"私の一存では決めかねますので、上司に相談してみます。", meaning:"交渉をする", explain:"Tình huống dùng: 交渉をする", quiz:{ mode:'situation', term:"私の一存では決めかねますので、上司に相談してみます。", options:["あいさつ（決まった言い方）","会社を訪問する","交渉をする","会議をする"], correct:2 } },
+    { id:"tk-25", term:"あらためて、ご連絡をさしあげます。", meaning:"交渉をする", explain:"Tình huống dùng: 交渉をする", quiz:{ mode:'situation', term:"あらためて、ご連絡をさしあげます。", options:["会議をする","電話をかける","会社を訪問する","交渉をする"], correct:3 } },
+    { id:"tk-26", term:"ご結婚、おめでとうございます。（結婚）", meaning:"あいさつ（決まった言い方）", explain:"Tình huống dùng: あいさつ（決まった言い方）", quiz:{ mode:'situation', term:"ご結婚、おめでとうございます。（結婚）", options:["あいさつ（決まった言い方）","電話を代わる","電話をかける","会社を訪問する"], correct:0 } },
+    { id:"tk-27", term:"心からお悔やみを申し上げます。（訃報）", meaning:"あいさつ（決まった言い方）", explain:"Tình huống dùng: あいさつ（決まった言い方）", quiz:{ mode:'situation', term:"心からお悔やみを申し上げます。（訃報）", options:["電話をかける","会議をする","交渉をする","あいさつ（決まった言い方）"], correct:3 } },
+    { id:"tk-28", term:"一日も早くお元気になられるようお祈りしています。（病気）", meaning:"あいさつ（決まった言い方）", explain:"Tình huống dùng: あいさつ（決まった言い方）", quiz:{ mode:'situation', term:"一日も早くお元気になられるようお祈りしています。（病気）", options:["会社を訪問する","会議をする","あいさつ（決まった言い方）","電話を代わる"], correct:2 } },
+    { id:"tk-29", term:"頑張ってください。ご活躍をお祈りしています。（送別）", meaning:"あいさつ（決まった言い方）", explain:"Tình huống dùng: あいさつ（決まった言い方）", quiz:{ mode:'situation', term:"頑張ってください。ご活躍をお祈りしています。（送別）", options:["あいさつ（決まった言い方）","電話を受ける","会社を訪問する","電話を代わる"], correct:0 } },
+  ];
+
+  const READING_PASSAGES = [
+    { id:"rd-1", topic:"雇用契約書", passage:"次の文章は、雇用者甲と被雇用者乙との間に交わされた雇用契約書の一部です。2006年4月1日以降も現在と同条件で契約を続けたい場合、2006年3月1日までに何をしなければなりませんか。\n\n第15条（契約の期間）\n　委嘱期間は2005年4月1日から2006年3月31日までとする。\n　ただし、有効期間満了30日前までに、甲乙いずれかが口頭または書面により、この契約の改訂を申し出ない場合には、同一条件をもって自動的にさらに1年延長するものとし、以後この例にならうものとする。", question:"2006年4月1日以降も現在と同条件で契約を続けたい場合、2006年3月1日までに何をしなければなりませんか。", options:["口頭による継続手続き","書面による継続手続き","口頭と書面による継続手続き","継続手続きの必要はない"], correct:3, explain:"Hợp đồng có điều khoản tự động gia hạn thêm 1 năm với cùng điều kiện, TRỪ KHI một trong hai bên chủ động đề nghị thay đổi (bằng lời hoặc văn bản) trước 30 ngày khi hết hạn. Vì muốn giữ nguyên điều kiện cũ nên không cần làm gì cả — đáp án 4." },
+    { id:"rd-2", topic:"取引先からの文書（事業所移転の通知）", passage:"取引先から次のような文書が届きました。どのような内容の文書ですか。\n\n拝啓　貴社ますますご清栄のこととお喜び申し上げます。平素は格別のお引き立てを賜り厚く御礼申し上げます。\n　さて、弊社は、大阪地区における営業体制の一層の強化充実と業務拡大を図るため、事業所名を大阪営業所から大阪本社と改め、併せて下記の通り移転致しますので、ご連絡申し上げます。\n　なお、電話・ファックス番号は変更がありません。従来にも増して営業・サービス活動の一層の向上に努めて参りますので、倍旧のご鞭撻を賜りますようお願い申し上げます。\n敬具\n新住所　〒535-○○○○　大阪府……", question:"どのような内容の文書ですか。", options:["事業部の営業体制の強化と拡大のお知らせ","社名変更のお知らせ","事業所名と住所の変更のお知らせ","電話番号とファックス番号の変更のお知らせ"], correct:2, explain:"Văn bản có 3 phần: tiền văn (chào hỏi), chính văn (bắt đầu bằng 'さて' — nội dung chính: đổi tên và chuyển địa điểm văn phòng), hậu văn. Phần quan trọng nhất nằm sau 'さて': đổi tên văn phòng + chuyển địa chỉ mới → đáp án 3." },
+    { id:"rd-3", topic:"社内報：社長の談話", passage:"次の記事は社内報に載った社長の談話です。この会社が最も大切にしていることは何ですか。\n\nわが業界の年間受注額は5年前のピーク以降、年々減少しています。それにもかかわらず、わが社の受注額はこの間、年平均5%の増加を示しています。これは、当社が\"お客さまの信用\"を基本方針として、お客さまに満足していただけるよう、仕事の規模の大小を問わず地道な努力を重ねてきた結果であると確信しております。従業員の皆さんも、この方針にのっとり、同業他社との競争に打ち勝つよう頑張ってこられました。あらためて皆さんに深い敬意と感謝の意を表したいと思います。\n　また、当社がこれまで取り組んできた地球環境問題や地域社会との交流も引き続き行い、今後も社会のお役に立ちたいと考えております。", question:"この会社が最も大切にしていることは何ですか。", options:["業界での立場","顧客の満足","地球環境問題への取り組み","地域社会との交流"], correct:1, explain:"Trong bài phát biểu, chủ tịch nêu 3 việc: (1) lấy 'sự tín nhiệm của khách hàng' làm phương châm cơ bản để nâng cao sự hài lòng của khách hàng, (2) tham gia vấn đề môi trường, (3) giao lưu với cộng đồng. Câu hỏi là 'điều quan trọng NHẤT' → chính là phương châm cơ bản của công ty = sự hài lòng của khách hàng → đáp án 2." },
+    { id:"rd-4", topic:"決裁書", passage:"次の文書は、高額支出の承認を申請する決裁書です。何を目的として支出の承認を申請していますか。\n\n決裁書\n件名：顧客オンライン・システムの開発\n下記支出につき、ご承認をお願いいたします。\n1. 金額：10,000,000円（予算外）\n2. 目的：今年度の重点経営施策の一環として承認された社内情報システムの合理化については、担当部としてソフト開発を前倒しするなど努力しているところです。さて、このたび営業部門から、MJ商事と当社の間のオンラインによるデータ交換システムの構築について、緊急の要請がありました。本システム開発後は社内システムとの連動による合理化効果も大きいと予想されます。つきましては、現在、社内情報システムの開発で社内人員に余力がないため、本システム開発において、基本設計以外をすべてアウトソーシングにより実施したいと考えます。以上から、本費用の支出にご承認をお願いいたします。", question:"何を目的として支出の承認を申請していますか。", options:["社内情報システムの開発","社内データ交換システムの開発","顧客間オンライン・システムの開発","アウトソーシングによる顧客オンライン・システムの開発"], correct:3, explain:"'目的' phần quan trọng nằm sau 'さて': (1) yêu cầu khẩn từ bộ kinh doanh về xây dựng hệ thống trao đổi dữ liệu online với công ty MJ, (2) do nhân sự nội bộ không đủ nên muốn outsource toàn bộ trừ thiết kế cơ bản. Mục đích chi tiền = phát triển hệ thống online cho khách hàng bằng cách outsourcing → đáp án 4." },
+    { id:"rd-5", topic:"取引先への文書（見本送付の連絡）", passage:"次の文は、ある会社へあてた文書です。主要な用件は何ですか。\n\n拝啓　時下ますますご清栄のこととお喜び申し上げます。\n　先日は私どもの新商品説明会に貴重なお時間を割いてご出席いただき、誠にありがとうございました。\n　当日ご要望のありました商品の見本はただいま製作中でございます。今月20日に発送の予定でございますので、少々お待ちいただきますようお願い申し上げます。\n　なお、仕様書を同封いたしましたので、あらかじめご検討ください。ご質問、ご要望などございましたら、ご遠慮なくお問い合わせください。まずは取り急ぎ要件まで。\n敬具", question:"主要な用件は何ですか。", options:["新商品説明会出席へのお礼","商品見本の製作日について","商品見本の納期について","仕様書の検討依頼"], correct:2, explain:"Văn bản gồm tiền văn (cảm ơn đã tham dự — mang tính hình thức) và chính văn thật sự bắt đầu từ 'ただいま製作中' → thông báo ngày giao hàng mẫu (20 ngày này). 'なお' phía sau (về tài liệu quy cách) chỉ là thông tin phụ, không phải trọng tâm → đáp án 3 (thời hạn giao mẫu hàng)." },
+    { id:"rd-6", topic:"決算に関するグラフ問題", passage:"下のグラフは次の記事を単純化して示したものです。グラフ中のCは固定費です。A、B、Dは、売上高、変動費、総コストのそれぞれ何を表していますか。\n\n明暗を分けた決算\n　製薬会社のX社とY社の20**年度の決算が発表された。両社は同種の薬品をほぼ同量生産・販売し、売上高もほとんど同じでありながら利益額ではY社はX社の6割にも満たない。財務諸表を比較分析した結果、両社の収益力の差はコスト構造の差にあることが分かった。つまりX社は効率化を徹底して、固定費を大幅に削減し、変動費を含む総コストを抑え、損益分岐点を引き下げることに成功した。", question:"A、B、Dは、売上高、変動費、総コストのそれぞれ何を表していますか。", options:["Aは売上高　Bは変動費　Dは総コスト","Aは売上高　Bは総コスト　Dは変動費","Aは総コスト　Bは変動費　Dは売上高","Aは総コスト　Bは売上高　Dは変動費"], correct:1, explain:"Bài báo nói '売上高 của 2 công ty gần như bằng nhau' → đường A hoặc D (2 đường gần trùng nhau ở biểu đồ) là doanh số. X社 đã 'giảm mạnh chi phí cố định, kìm hãm tổng chi phí bao gồm cả biến phí' → tổng chi phí (đường B) và biến phí (đường D) đều giảm ở X社 so với Y社. Kết hợp: A=売上高, B=総コスト, D=変動費 → đáp án 2." },
+    { id:"rd-7", topic:"Eメール（新製品説明の申し出）", passage:"さくら工業の佐藤さんから次のようなメールが届きました。メールの用件は何ですか。\n\n件名：小社新製品のご説明に関して\nカトウ商事（株）　鈴木昭夫様\n\nメールを拝読いたしました。弊社の新製品にお問い合わせをいただき、お礼申し上げます。\n早速ですが、製品のご説明に伺いたいと思います。来週、以下のどちらかで御社に伺わせていただきたいのですが、いかがでしょうか。\n日時：10/18（月）10:00〜11:00　　10/19（火）9:30〜10:30\n資料を見ながらのご説明に1時間ほどいただければと思っております。ご連絡をお待ちしております。\nさくら工業（株）佐藤一郎", question:"メールの用件は何ですか。", options:["鈴木さんにさくら工業まで来てほしい。","鈴木さんあてに資料を送る。","さくら工業で2回、説明会を開きたい。","カトウ商事で製品の説明をしたい。"], correct:3, explain:"Người gửi (さくら工業の佐藤) muốn đến CÔNG TY của người nhận (カトウ商事) để giải thích sản phẩm ('御社に伺わせていただきたい' = xin phép được đến quý công ty), đề xuất 2 khung giờ để người nhận CHỌN 1 (không phải tổ chức 2 lần) → đáp án 4." },
+    { id:"rd-8", topic:"取引先からの文書（棚卸し協力依頼）", passage:"取引先から次のような文書が届きました。主要な用件は何ですか。\n\n拝啓　時下ますますご隆昌の段お喜び申し上げます。平素は当社の製品在庫に関する受け払い作業、並びに在庫棚卸し業務等につき、良好な管理をしていただき厚く御礼申し上げます。\n　さて、早速ですが、最近の傾向として在庫品の品目数および金額が顕著に増加してきており、その削減対策のため全在庫品につき流動性等の実態を早急に把握する必要性が出てまいりました。つきましては、お忙しいところ恐縮ですが今月末に臨時の全在庫棚卸しを実施いたしたく貴社の全面的なご協力をお願い致します。\n　今回は従来の抜き取り方式ではなく全品棚卸しとなりますので貴社には相当のご負担をお掛けすることになりますが、以上の事情をご賢察の上よろしくお願いする次第です。なお、その際最近3年間の在庫品受け払いデータをご用意ください。", question:"主要な用件は何ですか。", options:["良好な在庫管理へのお礼","在庫品の削減対策依頼","在庫品の全品棚卸しへの協力依頼","在庫品の受け払いデータ提出依頼"], correct:2, explain:"Chính văn (sau 'さて'): do lượng tồn kho tăng đáng kể nên cần nắm thực trạng gấp → 'つきましては' đưa ra yêu cầu chính: hợp tác kiểm kê TOÀN BỘ hàng tồn kho cuối tháng này (thay vì kiểm mẫu như trước). Yêu cầu về dữ liệu 3 năm chỉ là phụ ('なお') → đáp án 3." },
+    { id:"rd-9", topic:"業績予想の記事", passage:"次の記事は、ある会社の業績予想の一部です。利益が下がる主な理由は何だと言っていますか。\n\n今期の売上は国内、国外とも順調で、年初予想の1,000億円到達は無理としても前期比10%増は可能と見込まれている。\n経費面で、前期に実施した人員合理化の効果に加え、販売管理費等の削減などプラス要因はあったものの、原油価格上昇に伴う原料費の増加が大きなマイナス要因となった。その結果、コスト削減の努力も及ばず、減益となりそうだ。", question:"利益が下がる主な理由は何だと言っていますか。", options:["売上が年初の予想を下回りそうなこと。","人員合理化の効果が小さかったこと。","販売管理費の削減ができなかったこと。","原油価格が上昇し、原料費が増加したこと。"], correct:3, explain:"Doanh số thực tế vẫn tăng tốt (chỉ không đạt mục tiêu ban đầu, không phải nguyên nhân giảm lợi nhuận). Về chi phí: nhân sự và chi phí quản lý bán hàng đều là yếu tố TÍCH CỰC (đã giảm), nhưng giá dầu tăng kéo theo chi phí nguyên liệu tăng là yếu tố TIÊU CỰC lớn nhất khiến lợi nhuận giảm → đáp án 4." },
+    { id:"rd-10", topic:"招待状", passage:"次のような文書が来ました。これを受け取った人は何に招待されましたか。\n\n丸友信託銀行　国際投資部　本田様\n拝啓　貴社ますますご清栄のこととお喜び申し上げます。平素より多大なるご協力を賜り、厚く御礼申し上げます。\n　さて、このたび欧州におけるソフトウェア業界を代表する企業でありますMAP社より、財務担当責任者であるR. Schmitt氏が来日し、先日同社決算が発表されたことを受けて、会社説明会を開催する運びとなりました。今回の来日はMAP社IR部のご好意によるものです。ご多忙の折、恐縮ではございますが、ご出席を賜りたく下記の通りご案内申し上げます。\n記　日時：3月17日（水）11:30〜13:00（受付11:00〜）　場所：ホテル○○芙蓉の間\n講演者：（株）MAP財務担当役員 Mr. Rolf Schmitt　司会進行：弊社アナリスト安田一男", question:"これを受け取った人は何に招待されましたか。", options:["アナリストミーティング","会社説明会","企業IRとのミーティング","決算発表会"], correct:1, explain:"Chính văn nêu rõ: nhân dịp giám đốc tài chính công ty MAP (châu Âu) sang Nhật sau khi công ty công bố quyết toán, ngân hàng tổ chức 'buổi giải thích công ty' (会社説明会) và mời người nhận tham dự → đáp án 2." },
+    { id:"rd-11", topic:"事故報告書", passage:"人身事故が起こったパソコン製造工場の責任者が、社長へ次のような事故報告書を提出しました。この事故の背景はどんなことですか。\n\n事故報告書\n1. 事故の状況：昨日15時30分ごろ第1倉庫内において、担当者Aが製品の出荷作業をしておりましたところ、積み上げてあった段ボール箱が荷崩れを起こしてAの頭部に当たり負傷しました。すぐ病院に連れて行き診察を受けましたが、全治2週間と診断されました。\n2. 事故原因：事故の直接的な原因は、本来3段積みと規定されている作業標準を守らず、不安定な4段に積んでいたことにあります。その他、現状の段ボール箱の強度にも問題があったことも判明しました。しかしながらこのような事故が発生した背景には、最近パソコンの在庫が急増したことがあります。このため外部業者への保管委託等の対策を取りましたが、増加分全部を減らすことはできず、応急対策として通路に置いたり4段積みにしたりせざるを得ませんでした。\n3. 今後の対策：……", question:"この事故の背景はどんなことですか。", options:["作業標準を守らなかったこと。","段ボール箱の強度が不足していたこと。","在庫製品の数量が急増してきたこと。","在庫品保管の外部委託対策を取らなかったこと。"], correct:2, explain:"Câu hỏi hỏi về 'bối cảnh' (背景), không phải 'nguyên nhân trực tiếp' (作業標準違反 và độ bền thùng carton — đó là 直接的な原因). Đoạn văn nói rõ: 'しかしながら...背景には、最近パソコンの在庫が急増したことがあります' → bối cảnh sâu xa là lượng tồn kho tăng đột biến → đáp án 3." },
+    { id:"rd-12", topic:"4社の業績比較グラフ", passage:"同業4社の業績を比較しました。次の記事はどの会社の説明ですか。\n\nしばらくの間、売上が伸び悩んでいた同社だが、積極的な海外展開が奏功し、昨年は売上が急増した。他方、利益面では着実な合理化と新製品の投入効果が実って順調な伸びを続けており、首位には及ばなかったものの昨年も好成績であった。\n\n（グラフ：4社の売上推移・純益比較、5年前〜1年前の推移、A社B社C社D社）", question:"次の記事はどの会社の説明ですか。", options:["A社","B社","C社","D社"], correct:2, explain:"3 gợi ý: (1) 'năm ngoái doanh số tăng vọt' → C社 hoặc D社 (đường tăng mạnh cuối biểu đồ); (2) 'lợi nhuận tăng đều liên tục' → B社 hoặc C社; (3) 'lợi nhuận năm ngoái tốt nhưng chưa đứng đầu' → C社. Giao của cả 3 điều kiện → C社 → đáp án 3." },
+    { id:"rd-13", topic:"Eメールへの返信（書き出し）", passage:"次のようなEメールが来たので返事を出します。書き出しはどのように書きますか。\n\n送信者：David Smith　件名：液晶パネルの件\n株式会社JL電気　営業部　佐藤一様\n\nお世話になっております。東京貿易のスミスです。先日はご多用のところをご来社くださり、ありがとうございました。そのとき、資料を拝見した液晶パネルの件ですが、本日アメリカの得意先より購入を検討したいとの連絡がありました。つきましては、下記の条件で見積りをお願いいたします。\n1. 品名：液晶パネルA-246　2. 数量：1,000台　3. 支払い条件など：基本取引契約の条件による　4. 見積り納期：8月12日\nなお、ご不明な点がありましたら担当までお問い合わせください。\n東京貿易株式会社　米州部　David Smith", question:"書き出しはどのように書きますか。", options:["液晶パネルのご注文をいただき、ありがとうございました。","液晶パネルの件でご来社いただき、ありがとうございました。","液晶パネルの見積りをご依頼いただき、ありがとうございました。","液晶パネルの資料をご請求いただき、ありがとうございました。"], correct:2, explain:"Nội dung email gốc là YÊU CẦU BÁO GIÁ (見積りをお願いいたします), không phải đặt hàng (注文), không phải chỉ đến thăm công ty, không phải chỉ xin tài liệu. Vậy câu mở đầu thư trả lời nên cảm ơn đúng về việc 'đã yêu cầu báo giá' → đáp án 3." },
+    { id:"rd-14", topic:"創立記念式典でのあいさつ", passage:"東京エレクロニクス創立30周年記念式典でされた、あいさつのいくつかが社内報に載りました。次のあいさつは誰のものですか。\n\n創立30周年を迎え、心よりお祝い申し上げます。業界の非常に厳しい環境にもかかわらず、当社が順調に創立30周年を迎えられることに対し、OBとして格別の喜びを感じております。\n私が経営の任に当たりましたのは平成5年から4年間でございますが、ちょうどバブル経済が崩壊してどこの企業も生き残りに懸命な時代でありました。当社も既に前年には赤字転落しており、私としても先行きに大変な危機感を持っておりました。そこで、私が最初に着手しましたのは徹底的な無駄の排除運動でした。……", question:"次のあいさつは誰のものですか。", options:["現社長","取引銀行頭取","労働組合委員長","元社長"], correct:3, explain:"Từ khóa: 'OBとして' (là người đã nghỉ hưu / cựu nhân viên của công ty) và '私が経営の任に当たりましたのは……4年間' (tôi từng đảm nhiệm việc điều hành trong 4 năm — nghĩa là NGUYÊN GIÁM ĐỐC, không phải giám đốc hiện tại) → đáp án 4 (元社長)." },
+    { id:"rd-15", topic:"慶弔見舞金規程", passage:"勤続7カ月の女性社員が勤続8年の男性と社内結婚します。規程によると、二人の結婚祝い金はいくらですか。\n\n慶弔見舞金規程\n第1条（目的）：この規程は、社員並びにその家族の慶弔禍福に際し、会社が祝福、弔意、見舞いの意を表し、金品を支給することに関して定めたものである。\n第2条（受給資格）：この規程は、勤続6カ月以上の社員を対象とする。\n第3条（種類）：慶弔見舞金の種類は、次の通りとする。(1)結婚祝い金 (2)出産祝い金 (3)見舞金\n第4条（結婚祝い金）：社員が結婚した場合には、次の通りの結婚祝い金を支給する。\n(1)勤続1年未満　1万円　(2)勤続1年以上5年未満　3万円　(3)勤続5年以上　7万円\n両者が社員の場合は、おのおのに支給する。", question:"二人の結婚祝い金はいくらですか。", options:["1万円","7万円","8万円","10万円"], correct:2, explain:"Cả hai đều đủ điều kiện (từ 6 tháng trở lên - 第2条). Theo 第4条: nữ (7 tháng, dưới 1 năm) = 1万円; nam (8 năm, từ 5 năm trở lên) = 7万円. Vì cả hai đều là nhân viên nên MỖI NGƯỜI được nhận riêng ('おのおのに支給する') → tổng 1万+7万 = 8万円 → đáp án 3." },
+  ];
+
+  const PRAISE = ['Chính xác! 🎯','Tuyệt vời! ✅','Giỏi lắm! 👏','Chuẩn không cần chỉnh! 🔥','Quá đỉnh! ✨','Đúng phóc! 💯','Đúng nhịp luôn! 🎶','Ngon lành! 🎤'];
+  const CORRECTION = ['Chưa đúng rồi 😅','Sai mất rồi, xem lại nhé','Chưa chuẩn đâu','Trật rồi, cùng xem lại nào','Gần đúng nhưng chưa phải 🤔'];
+  function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+  function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+  function buildDefaultData() {
+    const items = {};
+    TIERS.forEach(t => t.items.forEach((it, idx) => { const id=t.id+'-'+idx; items[id]=DEFAULT_STATUS[id]!==undefined?DEFAULT_STATUS[id]:0; }));
+    KANJI_VOCAB.forEach(k => { items[k.id]=0; });
+    allQuizzableItems().forEach(i => { if(items[i.id]===undefined) items[i.id]=0; });
+    return { items, studyDates: [], srs: {}, examHistory: [] };
+  }
+  function migrateData(data) {
+    if(!data.items) data.items={};
+    if(!data.studyDates) data.studyDates=[];
+    if(!data.srs) data.srs={};
+    if(!data.examHistory) data.examHistory=[];
+    TIERS.forEach(t => t.items.forEach((it, idx) => { const id=t.id+'-'+idx; if(data.items[id]===undefined) data.items[id]=DEFAULT_STATUS[id]!==undefined?DEFAULT_STATUS[id]:0; }));
+    KANJI_VOCAB.forEach(k => { if(data.items[k.id]===undefined) data.items[k.id]=0; });
+    allQuizzableItems().forEach(i => { if(data.items[i.id]===undefined) data.items[i.id]=0; });
+    return data;
+  }
+  function totalItems() { return TIERS.reduce((s,t)=>s+t.items.length,0); }
+  function masteredCount() { let c=0; TIERS.forEach(t=>t.items.forEach((it,idx)=>{ if(DATA.items[t.id+'-'+idx]===2) c++; })); return c; }
+  function kanjiMasteredCount() { return KANJI_VOCAB.filter(k=>(DATA.items[k.id]||0)===2).length; }
+
+  /* ===================== STATE ===================== */
+  let DATA = null;
+  let currentTab = 'dash';
+  let cardState = null;
+  let quizState = null;
+  let examState = null;
+
+  function fmtDate(d){ const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+day; }
+  function computeCurrentStreak(datesSet){
+    const today=new Date(); today.setHours(0,0,0,0); let cursor=new Date(today);
+    if(!datesSet.has(fmtDate(today))){ cursor.setDate(cursor.getDate()-1); if(!datesSet.has(fmtDate(cursor))) return 0; }
+    let streak=0; while(datesSet.has(fmtDate(cursor))){ streak++; cursor.setDate(cursor.getDate()-1); } return streak;
+  }
+  function computeBestStreak(datesArr){
+    const uniq=Array.from(new Set(datesArr)).sort(); if(uniq.length===0) return 0;
+    let best=1,cur=1;
+    for(let i=1;i<uniq.length;i++){ const diff=Math.round((new Date(uniq[i])-new Date(uniq[i-1]))/86400000); cur=diff===1?cur+1:1; if(cur>best) best=cur; }
+    return best;
+  }
+  async function loadData(){
+    if (HAS_CLAUDE_STORAGE) {
+      try{ const res=await window.storage.get(STORAGE_KEY,false); if(res&&res.value) return JSON.parse(res.value); }catch(e){}
+      return buildDefaultData();
+    }
+    try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+    return buildDefaultData();
+  }
+  let lastSaveError = null;
+  async function saveData(){
+    const payload = JSON.stringify(DATA);
+    if (!HAS_CLAUDE_STORAGE) {
+      try { localStorage.setItem(STORAGE_KEY, payload); lastSaveError=null; return true; }
+      catch(e){ lastSaveError=(e&&(e.message||e.toString()))||'Lỗi không xác định'; showSaveErrorBanner(); return false; }
+    }
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await window.storage.set(STORAGE_KEY, payload, false);
+        lastSaveError = null;
+        return true;
+      } catch (e) {
+        console.error('Lỗi lưu dữ liệu (lần '+attempt+'):', e);
+        lastSaveError = (e && (e.message || e.toString())) || 'Lỗi không xác định';
+        if (attempt < 3) await new Promise(r => setTimeout(r, 400 * attempt));
+      }
+    }
+    showSaveErrorBanner();
+    return false;
+  }
+  function showSaveErrorBanner(){
+    let el = document.getElementById('saveErrorBanner');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'saveErrorBanner';
+      el.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;max-width:588px;margin:0 auto;background:#3A1420;border:1.5px solid var(--pink);color:var(--pink);padding:12px 14px;border-radius:8px;font-family:var(--font-display);font-size:12.5px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+      document.body.appendChild(el);
+    }
+    el.textContent = '⚠ Không lưu được tiến độ: ' + lastSaveError + ' — thử tải lại trang hoặc kiểm tra bạn đang mở file qua Claude (không phải file tải về).';
+  }
+  function setItemStatus(id, status){ DATA.items[id]=status; }
+
+  /* ===================== SPACED REPETITION (SM-2 đơn giản hóa) ===================== */
+  function todayStr(){ return fmtDate(new Date()); }
+  function addDaysStr(dateStr, days){ const d=new Date(dateStr+'T00:00:00'); d.setDate(d.getDate()+days); return fmtDate(d); }
+  function initSRSIfNeeded(id){
+    if(!DATA.srs) DATA.srs={};
+    if(!DATA.srs[id]) DATA.srs[id] = { interval:0, ease:2.5, reps:0, due: todayStr() };
+  }
+  function reviewSRS(id, correct){
+    initSRSIfNeeded(id);
+    const s=DATA.srs[id];
+    if(correct){
+      s.reps++;
+      if(s.reps===1) s.interval=1;
+      else if(s.reps===2) s.interval=3;
+      else s.interval=Math.max(1, Math.round(s.interval*s.ease));
+      s.ease=Math.min(3.0, s.ease+0.05);
+      s.due=addDaysStr(todayStr(), s.interval);
+    } else {
+      s.reps=0; s.interval=0; s.ease=Math.max(1.3, s.ease-0.2);
+      s.due=todayStr(); // sai thì due ngay hôm nay để ôn lại sớm, không đợi qua ngày mai
+    }
+    s.lastReview=todayStr();
+  }
+  function findItemById(id){
+    if(id.indexOf('kv-')===0) return KANJI_VOCAB.find(k=>k.id===id);
+    return allQuizzableItems().find(i=>i.id===id);
+  }
+  function getDueItems(){
+    if(!DATA.srs) return [];
+    const today=todayStr();
+    return Object.keys(DATA.srs)
+      .filter(id => DATA.srs[id] && DATA.srs[id].due<=today)
+      .map(findItemById).filter(Boolean);
+  }
+
+  function allQuizzableItems(){
+    // Gộp mọi deck có cấu trúc quiz{sentence/term, options, correct} — dùng cho bộ lọc 苦手のみ toàn app.
+    // Không gồm KANJI_VOCAB (quiz dựng động riêng) và READING_PASSAGES (dạng bài đọc, xử lý riêng ở 読解実践/模試).
+    return [...STUDY_ITEMS, ...IDIOM_ITEMS, ...KATAKANA_ITEMS, ...GYOSEKI_ITEMS, ...SHANAI_ITEMS, ...TEIKEI_ITEMS];
+  }
+  function getDeck(key){
+    if(key==='1a') return STUDY_ITEMS.filter(i=>i.id.startsWith('1a-'));
+    if(key==='1b') return STUDY_ITEMS.filter(i=>i.id.startsWith('1b-'));
+    if(key==='kg') return STUDY_ITEMS.filter(i=>i.id.startsWith('kg-'));
+    if(key==='idiom') return IDIOM_ITEMS;
+    if(key==='katakana') return KATAKANA_ITEMS;
+    if(key==='gyoseki') return GYOSEKI_ITEMS;
+    if(key==='shanai') return SHANAI_ITEMS;
+    if(key==='teikei') return TEIKEI_ITEMS;
+    if(key==='weak') return allQuizzableItems().filter(i=>(DATA.items[i.id]||0)<2);
+    if(key==='kanji') return KANJI_VOCAB;
+    if(key==='all') return allQuizzableItems();
+    return STUDY_ITEMS;
+  }
+  const DECKS = [
+    ['1a','語彙・文法'], ['1b','表現読解'], ['kg','敬語'],
+    ['idiom','慣用表現'], ['teikei','定型表現'], ['katakana','カタカナ語'],
+    ['gyoseki','業績・景況'], ['shanai','社内文書・商取引'], ['kanji','漢字語彙'],
+    ['weak','苦手のみ（全デッキ対象）'], ['all','全項目まとめて'],
+  ];
+
+  /* ===================== RENDER: shell ===================== */
+  function render(){
+    const app=document.getElementById('app');
+    const dueCount=getDueItems().length;
+    app.innerHTML =
+      '<div class="masthead"><div class="eyebrow">VO TIEN DAT · BJT対策 · ♪ 39</div><h1>学習手帳</h1><p class="sub">ビジネス日本語能力テスト 学習トラッカー</p><div class="eq-bars"><span></span><span></span><span></span><span></span><span></span></div></div>' +
+      '<div class="tabbar">' +
+        '<button class="tab-btn'+(currentTab==='dash'?' active':'')+'" data-tab="dash">進捗</button>' +
+        '<button class="tab-btn'+(currentTab==='cards'?' active':'')+'" data-tab="cards">カード</button>' +
+        '<button class="tab-btn'+(currentTab==='quiz'?' active':'')+'" data-tab="quiz">クイズ</button>' +
+        '<button class="tab-btn'+(currentTab==='review'?' active':'')+'" data-tab="review">復習'+(dueCount>0?' ('+dueCount+')':'')+'</button>' +
+        '<button class="tab-btn'+(currentTab==='exam'?' active':'')+'" data-tab="exam">模試</button>' +
+      '</div>' +
+      '<div id="tabContent"></div>';
+    document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click', ()=>{ currentTab=b.getAttribute('data-tab'); cardState=null; quizState=null; render(); }));
+    const content=document.getElementById('tabContent');
+    if(currentTab==='dash') renderDashboard(content);
+    else if(currentTab==='cards') renderCardsTab(content);
+    else if(currentTab==='review') renderReviewTab(content);
+    else if(currentTab==='exam') renderExamTab(content);
+    else renderQuizTab(content);
+  }
+
+  /* ===================== RENDER: dashboard ===================== */
+  function renderDashboard(container){
+    const datesSet=new Set(DATA.studyDates);
+    const currentStreak=computeCurrentStreak(datesSet);
+    const bestStreak=Math.max(computeBestStreak(DATA.studyDates), currentStreak);
+    const todayStr=fmtDate(new Date());
+    const todayDone=datesSet.has(todayStr);
+    let stampRowHtml='';
+    for(let i=13;i>=0;i--){
+      const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i);
+      const ds=fmtDate(d); const filled=datesSet.has(ds); const isToday=ds===todayStr;
+      stampRowHtml+='<div class="stamp-day"><div class="stamp-dot'+(filled?' filled':'')+(isToday?' today-ring':'')+'">'+(filled?'♪':'')+'</div><div class="stamp-day-num">'+d.getDate()+'</div></div>';
+    }
+    const total=totalItems(); const mastered=masteredCount(); const pct=total?Math.round((mastered/total)*100):0;
+    const kanjiTotal=KANJI_VOCAB.length; const kanjiDone=kanjiMasteredCount();
+
+    let tiersHtml='';
+    TIERS.forEach(tier=>{
+      const tierMastered=tier.items.filter((_,idx)=>DATA.items[tier.id+'-'+idx]===2).length;
+      let rowsHtml='';
+      tier.items.forEach((item,idx)=>{
+        const id=tier.id+'-'+idx; const status=DATA.items[id]||0; const label=status===2?'済':(status===1?'中':'未'); const markContent=status===2?'♪':'';
+        rowsHtml+='<div class="item-row" data-status="'+status+'" data-id="'+id+'"><div class="item-mark s'+status+'">'+markContent+'</div><div class="item-text"><div class="item-jp">'+item[0]+'</div><div class="item-vn">'+item[1]+'</div></div><div class="item-state-label">'+label+'</div></div>';
+      });
+      tiersHtml+='<div class="tier"><div class="tier-head"><div><div class="tier-title">'+tier.title+'</div><div class="tier-sub">'+tier.sub+'</div></div><div class="tier-count">'+tierMastered+'/'+tier.items.length+'</div></div>'+rowsHtml+'</div>';
+    });
+
+    container.innerHTML =
+      '<div class="stampcard"><div class="streak-numbers">'+
+        '<div class="streak-block"><span class="streak-num">'+currentStreak+'</span><span class="streak-label">現在の連続日数</span></div>'+
+        '<div class="streak-divider"></div>'+
+        '<div class="streak-block"><span class="streak-num muted">'+bestStreak+'</span><span class="streak-label">自己ベスト</span></div>'+
+      '</div><div class="stamp-row">'+stampRowHtml+'</div>'+
+      '<button class="stamp-btn'+(todayDone?' done':'')+'" id="stampBtn">'+(todayDone?'本日記録済み ✓':'本日の学習を記録する')+'</button></div>'+
+      '<div class="progress-overview"><div class="progress-text"><b>'+mastered+'</b> / '+total+' 項目 完了（済）— '+pct+'%</div><div class="progress-bar-track"><div class="progress-bar-fill" style="width:'+pct+'%"></div></div></div>'+
+      '<div class="kanji-summary"><div class="kanji-summary-text">漢字語彙（ビジネス基本単語）<br><b>'+kanjiDone+'</b> / '+kanjiTotal+' 語 覚えた</div><button class="kanji-summary-btn" id="goKanji">練習する →</button></div>'+
+      '<div>'+tiersHtml+'</div>'+
+      '<div class="footer">'+
+        '<div class="backup-row"><button class="backup-btn" id="exportBtn">⭳ データ書き出し（バックアップ）</button><button class="backup-btn" id="importBtn">⭱ データ読み込み</button></div>'+
+        '<input type="file" id="importFileInput" accept="application/json" style="display:none;">'+
+        '<button class="reset-link" id="resetBtn" style="margin-top:14px;">データをリセット / Đặt lại toàn bộ dữ liệu</button>'+
+      '</div>';
+    document.getElementById('stampBtn').addEventListener('click', onStampToday);
+    document.getElementById('resetBtn').addEventListener('click', onReset);
+    document.getElementById('exportBtn').addEventListener('click', onExportData);
+    document.getElementById('importBtn').addEventListener('click', ()=>document.getElementById('importFileInput').click());
+    document.getElementById('importFileInput').addEventListener('change', onImportData);
+    document.getElementById('goKanji').addEventListener('click', ()=>{ currentTab='cards'; render(); startCards('kanji'); });
+    container.querySelectorAll('.item-row').forEach(row=>row.addEventListener('click', ()=>onToggleItem(row.getAttribute('data-id'))));
+  }
+  async function onStampToday(){
+    const todayStr=fmtDate(new Date());
+    if(!DATA.studyDates.includes(todayStr)){ DATA.studyDates.push(todayStr); await saveData(); render();
+      const lastDot=document.querySelector('.stamp-day:last-child .stamp-dot');
+      if(lastDot){ lastDot.classList.add('just-stamped'); setTimeout(()=>lastDot.classList.remove('just-stamped'),450); }
+    }
+  }
+  async function onToggleItem(id){
+    const cur=DATA.items[id]||0; const next=(cur+1)%3; DATA.items[id]=next; await saveData(); render();
+    if(next===2){ const mark=document.querySelector('.item-row[data-id="'+id+'"] .item-mark'); if(mark){ mark.classList.add('just-stamped'); setTimeout(()=>mark.classList.remove('just-stamped'),450); } }
+  }
+  async function onReset(){
+    if(!confirm('Xóa toàn bộ tiến độ và streak? Hành động này không thể hoàn tác.')) return;
+    DATA=buildDefaultData(); await saveData(); render();
+  }
+  function onExportData(){
+    const payload=JSON.stringify({ exportedAt:new Date().toISOString(), appVersion:'bjt-tracker-v2', data:DATA }, null, 2);
+    const blob=new Blob([payload], {type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const d=new Date(); const stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    a.href=url; a.download='bjt-tracker-backup-'+stamp+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+  function onImportData(ev){
+    const file=ev.target.files && ev.target.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=async ()=>{
+      try{
+        const parsed=JSON.parse(reader.result);
+        const incoming=parsed.data || parsed; // hỗ trợ cả file export mới lẫn JSON DATA thô
+        if(!incoming || typeof incoming!=='object' || !incoming.items) throw new Error('File không đúng định dạng backup của app này.');
+        if(!confirm('Khôi phục dữ liệu từ file backup này? Toàn bộ tiến độ hiện tại sẽ bị GHI ĐÈ.')) return;
+        DATA=migrateData(incoming);
+        await saveData();
+        render();
+        alert('Đã khôi phục dữ liệu thành công!');
+      }catch(e){
+        alert('Không đọc được file: '+(e&&e.message?e.message:'định dạng không hợp lệ'));
+      }
+      ev.target.value='';
+    };
+    reader.readAsText(file);
+  }
+
+  /* ===================== RENDER: flashcards ===================== */
+  function renderCardsTab(container){
+    if(!cardState){ renderDeckPicker(container, 'cards'); return; }
+    const item=cardState.deck[cardState.idx];
+    const isKanji = item.reading !== undefined;
+    const backHtml = isKanji
+      ? '<div class="card-reading">'+item.reading+'</div><div class="card-meaning">'+item.meaning+'</div>'
+      : '<div class="card-meaning">'+item.meaning+'</div><div class="card-explain">'+item.explain+'</div>';
+    container.innerHTML =
+      '<div class="card-deckbar"><button class="deckbar-back" id="deckBack">← デッキ選択</button><span class="card-progress">'+(cardState.idx+1)+' / '+cardState.deck.length+'</span></div>'+
+      '<div class="flip-scene"><div class="flip-card'+(cardState.flipped?' flipped':'')+'" id="flipCard">'+
+        '<div class="flip-face front"><span class="flip-hint">タップしてめくる</span><div class="card-term">'+item.term+'</div></div>'+
+        '<div class="flip-face back"><span class="flip-hint">MEANING</span>'+backHtml+'</div>'+
+      '</div></div>'+
+      '<div class="card-controls"><button class="card-btn again" id="btnAgain">もう一度 (chưa nhớ)</button><button class="card-btn know" id="btnKnow">分かった (đã nhớ)</button></div>'+
+      '<div class="card-nav"><button class="nav-btn" id="btnPrev"'+(cardState.idx===0?' disabled':'')+'>← 前へ</button><button class="nav-btn" id="btnNext"'+(cardState.idx===cardState.deck.length-1?' disabled':'')+'>次へ →</button></div>';
+    document.getElementById('deckBack').addEventListener('click', ()=>{ cardState=null; render(); });
+    document.getElementById('flipCard').addEventListener('click', ()=>{ cardState.flipped=!cardState.flipped; renderCardsTab(container); });
+    document.getElementById('btnPrev').addEventListener('click', ()=>{ if(cardState.idx>0){ cardState.idx--; cardState.flipped=false; renderCardsTab(container);} });
+    document.getElementById('btnNext').addEventListener('click', ()=>{ if(cardState.idx<cardState.deck.length-1){ cardState.idx++; cardState.flipped=false; renderCardsTab(container);} });
+    document.getElementById('btnKnow').addEventListener('click', async ()=>{ setItemStatus(item.id,2); reviewSRS(item.id,true); await saveData(); advanceCard(container); });
+    document.getElementById('btnAgain').addEventListener('click', async ()=>{ if((DATA.items[item.id]||0)<1) setItemStatus(item.id,1); reviewSRS(item.id,false); await saveData(); advanceCard(container); });
+  }
+  function advanceCard(container){
+    if(cardState.idx<cardState.deck.length-1){ cardState.idx++; cardState.flipped=false; renderCardsTab(container); }
+    else { renderCardsTab(container); }
+  }
+
+  /* ===================== RENDER: quiz ===================== */
+  function renderQuizTab(container){
+    if(!quizState){ renderDeckPicker(container, 'quiz'); return; }
+    if(quizState.idx>=quizState.list.length){ renderQuizResult(container); return; }
+    const q=quizState.list[quizState.idx];
+    let optsHtml='';
+    q.options.forEach((opt,i)=>{
+      let cls='quiz-opt';
+      if(quizState.answered){ cls+=' disabled'; if(opt.isCorrect) cls+=' correct'; else if(i===quizState.selected) cls+=' wrong'; }
+      optsHtml+='<button class="'+cls+'" data-i="'+i+'"'+(quizState.answered?' disabled':'')+'>'+opt.text+'</button>';
+    });
+    let feedbackHtml='';
+    if(quizState.answered){
+      const wasCorrect=q.options[quizState.selected].isCorrect;
+      feedbackHtml='<div class="feedback-box '+(wasCorrect?'ok':'bad')+'"><div class="feedback-title">'+(wasCorrect?pick(PRAISE):pick(CORRECTION))+'</div><div class="feedback-explain">'+q.explain+'</div></div>'+
+        '<button class="quiz-next-btn" id="quizNextBtn">'+(quizState.idx===quizState.list.length-1?'結果を見る':'次の問題へ')+'</button>';
+    }
+    const sentenceHtml = q.mode==='reading'
+      ? '<div class="quiz-prompt">正しい読み方はどれですか？</div><div class="quiz-sentence kanji-term">'+q.term+'</div>'
+      : q.mode==='meaning'
+      ? '<div class="quiz-prompt">正しい意味はどれですか？</div><div class="quiz-sentence kanji-term">'+q.term+'</div>'
+      : q.mode==='situation'
+      ? '<div class="quiz-prompt">どんな場面で使う表現ですか？</div><div class="quiz-sentence">'+q.term+'</div>'
+      : '<div class="quiz-sentence">'+q.sentence.replace(/＿＿＿/g,'<span class="blank">＿＿＿</span>')+'</div>';
+    container.innerHTML =
+      '<div class="card-deckbar"><button class="deckbar-back" id="deckBack">← デッキ選択</button><span class="card-progress">'+(quizState.idx+1)+' / '+quizState.list.length+'</span></div>'+
+      '<div class="quiz-score">正解 '+quizState.score+' / '+quizState.idx+'</div>'+
+      sentenceHtml +
+      '<div class="quiz-options">'+optsHtml+'</div>'+
+      feedbackHtml;
+    document.getElementById('deckBack').addEventListener('click', ()=>{ quizState=null; render(); });
+    if(!quizState.answered){
+      container.querySelectorAll('.quiz-opt').forEach(btn=>btn.addEventListener('click', ()=>onSelectAnswer(container, parseInt(btn.getAttribute('data-i')))));
+    } else {
+      document.getElementById('quizNextBtn').addEventListener('click', ()=>{ quizState.idx++; quizState.answered=false; quizState.selected=null; renderQuizTab(container); });
+    }
+  }
+  async function onSelectAnswer(container, i){
+    const q=quizState.list[quizState.idx];
+    quizState.answered=true; quizState.selected=i;
+    const correct=q.options[i].isCorrect;
+    if(correct) quizState.score++;
+    setItemStatus(q.id, correct?2:1);
+    reviewSRS(q.id, correct);
+    await saveData();
+    renderQuizTab(container);
+  }
+  function renderQuizResult(container){
+    const pct=Math.round((quizState.score/quizState.list.length)*100);
+    const backLabel = quizState.isReview ? '復習に戻る' : 'デッキ選択に戻る';
+    container.innerHTML =
+      '<div class="result-box"><div class="result-score">'+quizState.score+'/'+quizState.list.length+'</div><div class="result-label">正解率 '+pct+'%</div>'+
+      '<div class="result-actions">'+(quizState.isReview?'':'<button class="quiz-next-btn" id="retrySame">もう一度</button>')+'<button class="nav-btn" id="backDeck">'+backLabel+'</button></div></div>';
+    const retryBtn=document.getElementById('retrySame');
+    if(retryBtn) retryBtn.addEventListener('click', ()=>{ startQuiz(quizState.deckKey); });
+    document.getElementById('backDeck').addEventListener('click', ()=>{
+      const wasReview=quizState.isReview; quizState=null;
+      if(wasReview) renderReviewTab(container); else render();
+    });
+  }
+
+  /* ===================== RENDER: 復習 (spaced repetition) ===================== */
+  function renderReviewTab(container){
+    if(quizState){ renderQuizTab(container); return; }
+    const due=getDueItems();
+    if(due.length===0){
+      container.innerHTML='<div class="review-empty">✨ Hôm nay không có mục nào cần ôn lại!<br><br>Hệ thống lặp lại ngắt quãng (spaced repetition) sẽ tự nhắc bạn ôn lại đúng lúc sắp quên — dựa trên mỗi lần bạn trả lời đúng/sai ở tab カード và クイズ. Cứ học mục mới bình thường, các mục đó sẽ tự động xuất hiện lại ở đây khi đến hạn.</div>';
+      return;
+    }
+    container.innerHTML =
+      '<div class="review-hero"><div class="review-due-num">'+due.length+'</div><div class="streak-label" style="margin-top:4px;">mục cần ôn lại hôm nay</div></div>'+
+      '<p style="font-size:12.5px;color:var(--text-soft);line-height:1.6;">Thứ tự ôn dựa trên đường cong quên (forgetting curve): mục nào bạn hay sai hoặc đã lâu chưa ôn sẽ được ưu tiên quay lại sớm hơn — đúng nguyên lý spaced repetition (kiểu Anki), không phải chỉ đánh dấu 未/中/済 thủ công.</p>'+
+      '<button class="exam-start-btn" id="startReviewBtn">復習を始める（'+due.length+'問）→</button>';
+    document.getElementById('startReviewBtn').addEventListener('click', startReviewSession);
+  }
+
+  /* ===================== shared deck picker ===================== */
+  function renderDeckPicker(container, mode){
+    let html='<div class="deck-picker">';
+    DECKS.forEach(([key,label])=>{
+      const deck=getDeck(key);
+      const meta = key==='kanji' ? deck.length+' 語（クイズは'+KANJI_QUIZ_BATCH+'問/回）' : deck.length+' 項目';
+      html+='<button class="deck-card" data-key="'+key+'"><div class="deck-name">'+label+'</div><div class="deck-meta">'+meta+'</div></button>';
+    });
+    html+='</div>';
+    container.innerHTML='<p style="font-size:13px;color:var(--text-soft);margin-top:0;">'+(mode==='cards'?'フラッシュカードのデッキを選んでください':'クイズのデッキを選んでください')+'</p>'+html;
+    container.querySelectorAll('.deck-card').forEach(btn=>btn.addEventListener('click', ()=>{
+      const key=btn.getAttribute('data-key');
+      if(mode==='cards') startCards(key); else startQuiz(key);
+    }));
+  }
+  function startCards(key){
+    const deck=shuffle(getDeck(key));
+    if(deck.length===0){ alert('このデッキには項目がありません。'); return; }
+    cardState={ deckKey:key, deck, idx:0, flipped:false };
+    render();
+  }
+  function buildQuizEntryFromItem(item){
+    const opts=item.quiz.options.map((text,i)=>({text, isCorrect:i===item.quiz.correct}));
+    const mode=item.quiz.mode||'sentence';
+    return { id:item.id, mode, sentence:item.quiz.sentence, term:item.quiz.term||item.term, explain:item.explain, options:shuffle(opts) };
+  }
+  function buildQuizEntryFromKanjiItem(item){
+    const decoyPool=KANJI_VOCAB.filter(k=>k.id!==item.id && k.reading!==item.reading);
+    const decoys=shuffle(decoyPool).slice(0,3).map(d=>d.reading);
+    const opts=shuffle([item.reading, ...decoys]).map(r=>({text:r, isCorrect:r===item.reading}));
+    return { id:item.id, mode:'reading', term:item.term, explain:item.meaning, options:opts };
+  }
+  function buildKanjiQuizList(){
+    const pool=shuffle(KANJI_VOCAB).slice(0, KANJI_QUIZ_BATCH);
+    return pool.map(buildQuizEntryFromKanjiItem);
+  }
+  function startQuiz(key){
+    if(key==='kanji'){ quizState={ deckKey:key, list:buildKanjiQuizList(), idx:0, score:0, answered:false, selected:null }; render(); return; }
+    const deck=shuffle(getDeck(key));
+    if(deck.length===0){ alert('このデッキには項目がありません。'); return; }
+    const list=deck.map(buildQuizEntryFromItem);
+    quizState={ deckKey:key, list, idx:0, score:0, answered:false, selected:null };
+    render();
+  }
+  function startReviewSession(){
+    const due=shuffle(getDueItems());
+    if(due.length===0) return;
+    const list=due.map(item => item.reading!==undefined ? buildQuizEntryFromKanjiItem(item) : buildQuizEntryFromItem(item));
+    quizState={ deckKey:'review', list, idx:0, score:0, answered:false, selected:null, isReview:true };
+    currentTab='review';
+    render();
+  }
+
+  /* ===================== RENDER: 模試 (mock exam — 35問, 40分, nguyên văn sách) ===================== */
+  function buildMockExamQuestions(){
+    const sec1 = shuffle(STUDY_ITEMS.filter(i=>i.id.startsWith('1a-'))).map(item=>{
+      const opts=item.quiz.options.map((text,i)=>({text, isCorrect:i===item.quiz.correct}));
+      return { id:item.id, mode:'sentence', section:'セクション1（語彙・文法）', sentence:item.quiz.sentence, explain:item.explain, options:shuffle(opts) };
+    });
+    const sec2 = shuffle(STUDY_ITEMS.filter(i=>i.id.startsWith('1b-'))).map(item=>{
+      const opts=item.quiz.options.map((text,i)=>({text, isCorrect:i===item.quiz.correct}));
+      return { id:item.id, mode:'sentence', section:'セクション2（表現読解）', sentence:item.quiz.sentence, explain:item.explain, options:shuffle(opts) };
+    });
+    const sec3 = shuffle(READING_PASSAGES).map(item=>{
+      const opts=item.options.map((text,i)=>({text, isCorrect:i===item.correct}));
+      return { id:item.id, mode:'passage', section:'セクション3（総合読解）', topic:item.topic, passage:item.passage, question:item.question, explain:item.explain, options:shuffle(opts) };
+    });
+    return [...sec1, ...sec2, ...sec3];
+  }
+  function fmtTime(sec){ const m=Math.floor(sec/60); const s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+  function stopExamTimer(){ if(examState && examState.timerHandle){ clearInterval(examState.timerHandle); examState.timerHandle=null; } }
+  function startExamTimer(){
+    stopExamTimer();
+    examState.timerHandle = setInterval(()=>{
+      if(!examState || examState.finished){ stopExamTimer(); return; }
+      examState.remainingSec--;
+      if(examState.remainingSec<=0){ examState.remainingSec=0; finishExam(true); return; }
+      const timerEl=document.getElementById('examTimerDisplay');
+      if(timerEl){ timerEl.textContent=fmtTime(examState.remainingSec); timerEl.classList.toggle('warn', examState.remainingSec<=300); }
+    }, 1000);
+  }
+  function startExam(){
+    const questions=buildMockExamQuestions();
+    examState = {
+      questions, answers:new Array(questions.length).fill(null), idx:0,
+      durationSec:40*60, remainingSec:40*60, finished:false, result:null, timerHandle:null
+    };
+    startExamTimer();
+    render();
+  }
+  async function finishExam(auto){
+    stopExamTimer();
+    const timeUsedSec=examState.durationSec-examState.remainingSec;
+    let score=0; const sectionScores={};
+    examState.questions.forEach((q,i)=>{
+      const ans=examState.answers[i];
+      const correct=ans!==null && q.options[ans].isCorrect;
+      if(correct) score++;
+      if(!sectionScores[q.section]) sectionScores[q.section]={correct:0,total:0};
+      sectionScores[q.section].total++;
+      if(correct) sectionScores[q.section].correct++;
+    });
+    examState.finished=true;
+    examState.result={ score, total:examState.questions.length, sectionScores, timeUsedSec, auto };
+    if(!DATA.examHistory) DATA.examHistory=[];
+    DATA.examHistory.unshift({ date:new Date().toISOString(), score, total:examState.questions.length, timeUsedSec, sectionScores, auto });
+    if(DATA.examHistory.length>20) DATA.examHistory=DATA.examHistory.slice(0,20);
+    await saveData();
+    render();
+  }
+  function renderExamTab(container){
+    if(!examState){ renderExamIntro(container); return; }
+    if(examState.finished){ renderExamResult(container); return; }
+    renderExamQuestion(container);
+  }
+  function renderExamIntro(container){
+    const hist=DATA.examHistory||[];
+    let histHtml='';
+    if(hist.length>0){
+      histHtml='<div class="exam-history"><div class="exam-history-title">これまでの受験履歴（新しい順・直近20件）</div>'+
+        hist.map(h=>{
+          const d=new Date(h.date);
+          const dateStr=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+          return '<div class="exam-history-row"><span>'+dateStr+'</span><span class="exam-history-score">'+h.score+'/'+h.total+'</span><span class="exam-history-meta">'+fmtTime(h.timeUsedSec)+(h.auto?' ・時間切れ':'')+'</span></div>';
+        }).join('')+
+        '</div>';
+    } else {
+      histHtml='<div class="exam-history"><div class="exam-history-title">受験履歴はまだありません</div></div>';
+    }
+    container.innerHTML =
+      '<div class="exam-intro">'+
+      '<div class="exam-notice"><b>模試について：</b> 35問（セクション1: 10問 + セクション2: 10問 + セクション3: 15問）／40分。Toàn bộ 35 câu lấy nguyên văn từ sách 「BJTビジネス日本語能力テスト 模試と対策」, không tự soạn thêm để tránh sai định dạng thi thật.<br><br>'+
+      '聴解・聴読解 (chiếm khoảng 2/3 thời lượng đề thi thật) không mô phỏng được vì project không có file âm thanh đi kèm sách — app này chỉ luyện được phần 読解.<br><br>'+
+      '⚠️ Vì chỉ có đúng 1 bộ 35 câu chuẩn định dạng thi thật, làm từ lần thứ 2-3 trở đi bạn sẽ dần nhớ vị trí đáp án — lúc đó điểm cao phản ánh trí nhớ nhiều hơn năng lực thật, hãy diễn giải kết quả một cách hoài nghi.</div>'+
+      '<button class="exam-start-btn" id="examStartBtn">模試を始める（35問・40分）→</button>'+
+      '</div>'+histHtml;
+    document.getElementById('examStartBtn').addEventListener('click', startExam);
+  }
+  function renderExamQuestion(container){
+    const q=examState.questions[examState.idx];
+    const total=examState.questions.length;
+    const answered=examState.answers[examState.idx];
+    const contentHtml = q.mode==='passage'
+      ? '<div class="exam-passage">'+q.passage+'</div><div class="quiz-sentence">'+q.question+'</div>'
+      : '<div class="quiz-sentence">'+q.sentence.replace(/＿＿＿/g,'<span class="blank">＿＿＿</span>')+'</div>';
+    let optsHtml='';
+    q.options.forEach((opt,i)=>{
+      optsHtml+='<button class="quiz-opt'+(answered===i?' exam-selected':'')+'" data-i="'+i+'">'+opt.text+'</button>';
+    });
+    const gridHtml=examState.questions.map((qq,i)=>{
+      let cls='exam-grid-btn';
+      if(i===examState.idx) cls+=' current';
+      else if(examState.answers[i]!==null) cls+=' answered';
+      return '<button class="'+cls+'" data-idx="'+i+'">'+(i+1)+'</button>';
+    }).join('');
+    container.innerHTML =
+      '<div class="exam-topbar"><span id="examTimerDisplay" class="exam-timer'+(examState.remainingSec<=300?' warn':'')+'">'+fmtTime(examState.remainingSec)+'</span><button class="exam-submit-btn" id="examSubmitBtn">提出する</button></div>'+
+      '<div class="exam-section-label">'+q.section+' ・ '+(examState.idx+1)+' / '+total+'</div>'+
+      contentHtml+
+      '<div class="quiz-options">'+optsHtml+'</div>'+
+      '<div class="exam-grid">'+gridHtml+'</div>'+
+      '<div class="exam-nav"><button id="examPrevBtn"'+(examState.idx===0?' disabled':'')+'>← 前へ</button><button id="examNextBtn"'+(examState.idx===total-1?' disabled':'')+'>次へ →</button></div>';
+    container.querySelectorAll('.quiz-opt').forEach(btn=>btn.addEventListener('click', ()=>{
+      examState.answers[examState.idx]=parseInt(btn.getAttribute('data-i'));
+      renderExamQuestion(container);
+    }));
+    container.querySelectorAll('.exam-grid-btn').forEach(btn=>btn.addEventListener('click', ()=>{
+      examState.idx=parseInt(btn.getAttribute('data-idx'));
+      renderExamQuestion(container);
+    }));
+    const prevBtn=document.getElementById('examPrevBtn'); if(prevBtn) prevBtn.addEventListener('click', ()=>{ if(examState.idx>0){ examState.idx--; renderExamQuestion(container); } });
+    const nextBtn=document.getElementById('examNextBtn'); if(nextBtn) nextBtn.addEventListener('click', ()=>{ if(examState.idx<total-1){ examState.idx++; renderExamQuestion(container); } });
+    document.getElementById('examSubmitBtn').addEventListener('click', ()=>{
+      const unanswered=examState.answers.filter(a=>a===null).length;
+      const msg=unanswered>0 ? ('まだ'+unanswered+'問未回答です。本当に提出しますか？') : '提出しますか？提出後は変更できません。';
+      if(confirm(msg)) finishExam(false);
+    });
+  }
+  function renderExamResult(container){
+    const r=examState.result;
+    const sectionRows=Object.keys(r.sectionScores).map(sec=>{
+      const s=r.sectionScores[sec];
+      return '<div class="exam-history-row"><span>'+sec+'</span><span class="exam-history-score">'+s.correct+'/'+s.total+'</span></div>';
+    }).join('');
+    const reviewHtml=examState.questions.map((q,i)=>{
+      const ans=examState.answers[i];
+      const correct=ans!==null && q.options[ans].isCorrect;
+      const correctOpt=q.options.find(o=>o.isCorrect);
+      const qLabel=q.mode==='passage' ? (q.topic+' — '+q.question) : q.sentence.replace(/＿＿＿/g,'＿＿＿');
+      return '<div class="exam-review-item '+(correct?'':'wrong')+'">'+
+        '<div class="exam-review-q">'+(i+1)+'. ['+q.section+']<br>'+qLabel+'</div>'+
+        '<div class="exam-review-ans '+(correct?'ok':'bad')+'">Bạn chọn: '+(ans!==null?q.options[ans].text:'(bỏ trống)')+(correct?' ✓':' ✗ — Đáp án đúng: '+correctOpt.text)+'</div>'+
+        '<div class="feedback-explain" style="margin-top:6px;">'+q.explain+'</div>'+
+        '</div>';
+    }).join('');
+    container.innerHTML =
+      '<div class="result-box" style="padding-top:6px;">'+
+        '<div class="result-score">'+r.score+'/'+r.total+'</div>'+
+        '<div class="result-label">正解率 '+Math.round(r.score/r.total*100)+'% ・ 所要時間 '+fmtTime(r.timeUsedSec)+(r.auto?'（時間切れ自動提出）':'')+'</div>'+
+      '</div>'+
+      '<div class="exam-result-section"><h3>セクション別スコア</h3>'+sectionRows+'</div>'+
+      '<div class="exam-result-section"><h3>解答確認（全'+r.total+'問）</h3>'+reviewHtml+'</div>'+
+      '<div class="result-actions" style="margin-top:16px;"><button class="quiz-next-btn" id="examBackBtn">模試トップに戻る</button></div>';
+    document.getElementById('examBackBtn').addEventListener('click', ()=>{ examState=null; render(); });
+  }
+
+  /* ===================== init ===================== */
+  (async function init(){ DATA=migrateData(await loadData()); render(); })();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => { /* im lặng khi không hỗ trợ (ví dụ trong Claude) */ });
+    });
+  }
+})();
+</script>
+</body>
+</html>
